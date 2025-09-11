@@ -1,0 +1,14 @@
+# Docker ignore file
+target/
+.mvn
+mvnw
+mvnw.cmd
+
+*.iml
+
+.gitignore
+
+.DS_Store
+Thumbs.db
+
+.dockerignore
