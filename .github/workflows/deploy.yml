@@ -33,13 +33,16 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
+    - name: Set image tag
+      run: echo "IMAGE_TAG=$(date +%Y%m%d-%H%M%S)" >> $GITHUB_ENV
+
     - name: Build Docker image
       run: |
         docker build -f service-apprunner/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
-        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:latest $ECR_REGISTRY/$ECR_REPOSITORY:$(date +%Y%m%d-%H%M%S)
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -52,7 +55,7 @@ jobs:
     - name: Push image to Amazon ECR
       run: |
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$(date +%Y%m%d-%H%M%S)
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
     - name: Update App Runner Service
       run: |
@@ -69,4 +72,4 @@ jobs:
       run: |
         echo "Deployment completed successfully!"
         echo "Image: $ECR_REGISTRY/$ECR_REPOSITORY:latest"
-        echo "Version: $(date +%Y%m%d-%H%M%S)"
+        echo "Version: $IMAGE_TAG"
