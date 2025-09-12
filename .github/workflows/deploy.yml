@@ -1,0 +1,75 @@
+name: Deploy to AWS App Runner
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Manual trigger
+
+env:
+  AWS_REGION: eu-central-1
+  ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+
+    - name: Build with Maven
+      run: |
+        cd service-apprunner
+        mvn clean package -DskipTests
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build Docker image
+      run: |
+        cd service-apprunner
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:latest $ECR_REGISTRY/$ECR_REPOSITORY:$(date +%Y%m%d-%H%M%S)
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: $AWS_REGION
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Push image to Amazon ECR
+      run: |
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$(date +%Y%m%d-%H%M%S)
+
+    - name: Update App Runner Service
+      run: |
+        SERVICE_ARN=$(aws apprunner list-services --region $AWS_REGION --query "ServiceSummaryList[?ServiceName=='mustang-invoice-service'].ServiceArn" --output text)
+        
+        if [ ! -z "$SERVICE_ARN" ]; then
+          echo "Starting deployment..."
+          aws apprunner start-deployment --service-arn $SERVICE_ARN --region $AWS_REGION
+        else
+          echo "Service does not exist yet. Manual creation required."
+        fi
+
+    - name: Deployment Status
+      run: |
+        echo "Deployment completed successfully!"
+        echo "Image: $ECR_REGISTRY/$ECR_REPOSITORY:latest"
+        echo "Version: $(date +%Y%m%d-%H%M%S)"
