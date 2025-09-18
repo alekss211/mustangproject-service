@@ -57,17 +57,6 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-    - name: Update App Runner Service
-      run: |
-        SERVICE_ARN=$(aws apprunner list-services --region $AWS_REGION --query "ServiceSummaryList[?ServiceName=='mustang-invoice-service'].ServiceArn" --output text)
-        
-        if [ ! -z "$SERVICE_ARN" ]; then
-          echo "Starting deployment..."
-          aws apprunner start-deployment --service-arn $SERVICE_ARN --region $AWS_REGION
-        else
-          echo "Service does not exist yet. Manual creation required."
-        fi
-
     - name: Deployment Status
       run: |
         echo "Deployment completed successfully!"
