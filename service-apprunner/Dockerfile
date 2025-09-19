@@ -22,6 +22,9 @@ RUN mvn clean install -DskipTests -pl library
 RUN mvn clean install -DskipTests -pl validator -am
 RUN mvn clean package -DskipTests -pl service-apprunner -am
 
+# Verify the JAR was created
+RUN ls -la /app/service-apprunner/target/
+
 # Runtime Stage
 FROM openjdk:11-jre-slim
 
@@ -30,8 +33,11 @@ WORKDIR /app
 # Install curl für Health Checks
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
-# Kopiere das gebaute JAR
-COPY --from=build /app/service-apprunner/target/*.jar app.jar
+# Kopiere das gebaute JAR (specifically the Spring Boot executable JAR)
+COPY --from=build /app/service-apprunner/target/service-apprunner-*.jar app.jar
+
+# Verify the JAR was copied
+RUN ls -la /app/
 
 # Health Check für AWS App Runner wurde entfernt
 # Löst Fehler aus, da Health Check ausgeführt wird, bevor der Service gestartet ist
@@ -43,5 +49,5 @@ EXPOSE 8080
 RUN useradd -m myuser
 USER myuser
 
-# Entrypoint
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Entrypoint with better error handling and logging
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-Dserver.port=8080", "-jar", "app.jar"]
