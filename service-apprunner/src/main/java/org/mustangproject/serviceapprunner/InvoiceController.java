@@ -37,6 +37,7 @@ public class InvoiceController {
         response.put("service", "mustangproject-service");
         response.put("version", "2.19.1-SNAPSHOT");
         
+        
         return ResponseEntity.ok(response);
     }
 
