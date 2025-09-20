@@ -37,11 +37,11 @@ public class InvoiceController {
         response.put("service", "mustangproject-service");
         response.put("version", "2.19.1-SNAPSHOT");
         
-        
+
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(value = "/generate-zugferd", produces = MediaType.APPLICATION_PDF_VALUE)
+    @PostMapping(value = "/api/generate-zugferd", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> generateZUGFeRD(@RequestBody InvoiceDTO invoiceData) {
         try {
             // Generate ZUGFeRD PDF
