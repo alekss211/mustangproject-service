@@ -7,12 +7,12 @@ import org.mustangproject.Invoice;
 import org.mustangproject.Item;
 import org.mustangproject.Product;
 import org.mustangproject.TradeParty;
-import org.mustangproject.ZUGFeRD.ZUGFeRDExporterFromA3;
+import org.mustangproject.ZUGFeRD.ZUGFeRDVisualizer;
+import org.mustangproject.ZUGFeRD.ZUGFeRD2PullProvider;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -33,29 +33,25 @@ public class ZUGFeRDGenerationService {
             Invoice invoice = createInvoice(invoiceData);
             logger.info("Invoice object created successfully");
             
-            // Create ZUGFeRD exporter
-            logger.info("Creating ZUGFeRD exporter...");
-            try (ZUGFeRDExporterFromA3 exporter = new ZUGFeRDExporterFromA3()) {
-                logger.info("Setting transaction on exporter...");
-                exporter.setTransaction(invoice);
-                logger.info("Transaction set successfully");
-                
-                // Export to PDF with embedded ZUGFeRD XML
-                logger.info("Starting PDF export...");
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                exporter.export(outputStream);
-                
-                byte[] pdfBytes = outputStream.toByteArray();
-                logger.info("PDF export completed. Generated {} bytes", pdfBytes.length);
-                
-                if (pdfBytes.length == 0) {
-                    logger.error("Generated PDF is empty!");
-                    throw new RuntimeException("Generated PDF is empty");
-                }
-                
-                logger.info("=== ZUGFeRD Service: PDF generation successful ===");
-                return pdfBytes;
+            // Generate XML from invoice
+            logger.info("Generating XML from invoice...");
+            String xmlContent = generateXMLFromInvoice(invoice);
+            logger.info("XML generation completed. XML length: {} characters", xmlContent.length());
+            
+            // Create PDF from XML using ZUGFeRDVisualizer
+            logger.info("Creating PDF from XML using ZUGFeRDVisualizer...");
+            ZUGFeRDVisualizer visualizer = new ZUGFeRDVisualizer();
+            byte[] pdfBytes = visualizer.toPDF(xmlContent);
+            logger.info("PDF creation completed. Generated {} bytes", pdfBytes.length);
+            
+            if (pdfBytes.length == 0) {
+                logger.error("Generated PDF is empty!");
+                throw new RuntimeException("Generated PDF is empty");
             }
+            
+            logger.info("=== ZUGFeRD Service: PDF generation successful ===");
+            return pdfBytes;
+            
         } catch (Exception e) {
             logger.error("ZUGFeRD service failed during PDF generation", e);
             throw e;
@@ -139,6 +135,22 @@ public class ZUGFeRDGenerationService {
         
         logger.info("Invoice object creation completed successfully");
         return invoice;
+    }
+    
+    private String generateXMLFromInvoice(Invoice invoice) throws Exception {
+        logger.info("Converting Invoice to XML using ZUGFeRD2PullProvider...");
+        
+        // Use the Mustang library's ZUGFeRD2PullProvider to generate proper XML
+        ZUGFeRD2PullProvider xmlProvider = new ZUGFeRD2PullProvider();
+        xmlProvider.generateXML(invoice);
+        
+        byte[] xmlBytes = xmlProvider.getXML();
+        String xmlContent = new String(xmlBytes, java.nio.charset.StandardCharsets.UTF_8);
+        
+        logger.info("XML generation completed. Generated XML with {} characters", xmlContent.length());
+        logger.debug("Generated XML content: {}", xmlContent);
+        
+        return xmlContent;
     }
     
     private LocalDate parseDate(String dateString) {
