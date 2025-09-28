@@ -7,17 +7,9 @@
                 xmlns:xrv="http://www.example.org/XRechnung-Viewer"          
                 version="2.0">
 
-  <!-- Import the base templates -->
-  <xsl:import href="common-xr.xsl"/>
-  <xsl:import href="xr-content.xsl"/>
-  <xsl:import href="xr-pdf/lib/konstanten.xsl"/>
-  <xsl:import href="xr-pdf/lib/structure/layout-master-set.xsl"/>
-  <xsl:import href="xr-pdf/lib/structure/content-templates.xsl"/>
-  <xsl:import href="xr-pdf/lib/structure/page-sequence.xsl"/>
-
   <xsl:output method="xml" version="1.0" encoding="utf-8" /> 
 
-  <!-- Required parameters from the original template -->
+  <!-- Required parameters -->
   <xsl:param name="foengine"/>
   <xsl:param name="invoiceline-layout">normal</xsl:param>
   <xsl:param name="invoiceline-numbering">normal</xsl:param>
@@ -25,12 +17,17 @@
   <xsl:param name="axf.extensions" select="false()"/>
   <xsl:param name="fop.extensions" select="true()"/>
 
-  <!-- Override the main invoice template with our custom layout -->
+  <!-- Font and styling variables -->
+  <xsl:variable name="fontSans">Arial</xsl:variable>
+  <xsl:variable name="fontSerif">Times</xsl:variable>
+  <xsl:variable name="lang">de</xsl:variable>
+
+  <!-- Main invoice template -->
   <xsl:template match="xr:invoice">
     <fo:root xmlns:pdf="http://xmlgraphics.apache.org/fop/extensions/pdf"
       language="{$lang}" font-family="{$fontSans}">
       
-      <!-- Custom layout master set for single column layout -->
+      <!-- Custom layout master set -->
       <fo:layout-master-set>
         <fo:simple-page-master master-name="CustomInvoicePage" 
                                page-height="297mm" 
@@ -48,6 +45,7 @@
         </fo:page-sequence-master>
       </fo:layout-master-set>
 
+      <!-- PDF metadata -->
       <fo:declarations>
         <x:xmpmeta xmlns:x="adobe:ns:meta/">
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">

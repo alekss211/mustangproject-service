@@ -35,8 +35,8 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
         try {
             // Load our custom PDF template instead of the default one
             if (mXsltCustomPDFTemplate == null) {
-                logger.info("Loading custom PDF template: stylesheets/custom-invoice-layout.xsl");
-                InputStream templateStream = CLASS_LOADER.getResourceAsStream("stylesheets/custom-invoice-layout.xsl");
+                logger.info("Loading custom PDF template: stylesheets/custom-invoice-layout-standalone.xsl");
+                InputStream templateStream = CLASS_LOADER.getResourceAsStream("stylesheets/custom-invoice-layout-standalone.xsl");
                 if (templateStream == null) {
                     logger.warn("Custom template not found, falling back to default template");
                     super.applyXSLTToPDF(xmlFile, PDFOutstream);
