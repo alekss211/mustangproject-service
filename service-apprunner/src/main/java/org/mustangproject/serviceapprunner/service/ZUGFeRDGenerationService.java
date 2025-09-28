@@ -7,7 +7,6 @@ import org.mustangproject.Invoice;
 import org.mustangproject.Item;
 import org.mustangproject.Product;
 import org.mustangproject.TradeParty;
-import org.mustangproject.ZUGFeRD.ZUGFeRDVisualizer;
 import org.mustangproject.ZUGFeRD.ZUGFeRD2PullProvider;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -42,10 +41,10 @@ public class ZUGFeRDGenerationService {
             logger.info("XML generation completed in {}ms. XML length: {} characters", 
                 System.currentTimeMillis() - stepStart, xmlContent.length());
             
-            // Create PDF from XML using ZUGFeRDVisualizer
-            logger.info("Creating PDF from XML using ZUGFeRDVisualizer...");
+            // Create PDF from XML using CustomZUGFeRDVisualizer
+            logger.info("Creating PDF from XML using CustomZUGFeRDVisualizer...");
             stepStart = System.currentTimeMillis();
-            ZUGFeRDVisualizer visualizer = new ZUGFeRDVisualizer();
+            CustomZUGFeRDVisualizer visualizer = new CustomZUGFeRDVisualizer();
             byte[] pdfBytes = visualizer.toPDF(xmlContent);
             logger.info("PDF creation completed in {}ms. Generated {} bytes", 
                 System.currentTimeMillis() - stepStart, pdfBytes.length);
