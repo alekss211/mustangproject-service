@@ -26,34 +26,42 @@ public class ZUGFeRDGenerationService {
 
     public byte[] generateZUGFeRDPDF(InvoiceDTO invoiceData) throws Exception {
         logger.info("=== ZUGFeRD Service: Starting PDF generation ===");
+        long startTime = System.currentTimeMillis();
         
         try {
             // Create an invoice using the Mustang library
             logger.info("Creating Invoice object from DTO...");
+            long stepStart = System.currentTimeMillis();
             Invoice invoice = createInvoice(invoiceData);
-            logger.info("Invoice object created successfully");
+            logger.info("Invoice object created successfully in {}ms", System.currentTimeMillis() - stepStart);
             
             // Generate XML from invoice
             logger.info("Generating XML from invoice...");
+            stepStart = System.currentTimeMillis();
             String xmlContent = generateXMLFromInvoice(invoice);
-            logger.info("XML generation completed. XML length: {} characters", xmlContent.length());
+            logger.info("XML generation completed in {}ms. XML length: {} characters", 
+                System.currentTimeMillis() - stepStart, xmlContent.length());
             
             // Create PDF from XML using ZUGFeRDVisualizer
             logger.info("Creating PDF from XML using ZUGFeRDVisualizer...");
+            stepStart = System.currentTimeMillis();
             ZUGFeRDVisualizer visualizer = new ZUGFeRDVisualizer();
             byte[] pdfBytes = visualizer.toPDF(xmlContent);
-            logger.info("PDF creation completed. Generated {} bytes", pdfBytes.length);
+            logger.info("PDF creation completed in {}ms. Generated {} bytes", 
+                System.currentTimeMillis() - stepStart, pdfBytes.length);
             
             if (pdfBytes.length == 0) {
                 logger.error("Generated PDF is empty!");
                 throw new RuntimeException("Generated PDF is empty");
             }
             
-            logger.info("=== ZUGFeRD Service: PDF generation successful ===");
+            long totalTime = System.currentTimeMillis() - startTime;
+            logger.info("=== ZUGFeRD Service: PDF generation successful in {}ms ===", totalTime);
             return pdfBytes;
             
         } catch (Exception e) {
-            logger.error("ZUGFeRD service failed during PDF generation", e);
+            long totalTime = System.currentTimeMillis() - startTime;
+            logger.error("ZUGFeRD service failed during PDF generation after {}ms", totalTime, e);
             throw e;
         }
     }
