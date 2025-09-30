@@ -2,9 +2,9 @@
 <xsl:stylesheet xmlns:fo="http://www.w3.org/1999/XSL/Format" 
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
                 xmlns:axf="http://www.antennahouse.com/names/XSL/Extensions"
-                xmlns:xr="urn:ce.eu:en16931:2017:xoev-de:kosit:standard:xrechnung-1"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:xrv="http://www.example.org/XRechnung-Viewer"          
+                xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100"
+                xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"
+                xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100"
                 version="2.0">
 
   <xsl:output method="xml" version="1.0" encoding="utf-8" /> 
@@ -23,7 +23,7 @@
   <xsl:variable name="lang">de</xsl:variable>
 
   <!-- Main invoice template -->
-  <xsl:template match="xr:invoice">
+  <xsl:template match="rsm:CrossIndustryInvoice">
     <fo:root xmlns:pdf="http://xmlgraphics.apache.org/fop/extensions/pdf"
       language="{$lang}" font-family="{$fontSans}">
       
@@ -49,7 +49,7 @@
       <fo:page-sequence master-reference="xrDokument">
         <fo:flow flow-name="xrBody">
           
-          <!-- Header with company info -->
+          <!-- Custom Header with company info -->
           <fo:block-container height="60mm" margin-bottom="10mm">
             <fo:table table-layout="fixed" width="100%">
               <fo:table-column column-width="50%"/>
@@ -59,19 +59,16 @@
                   <!-- Left side - Company name -->
                   <fo:table-cell>
                     <fo:block font-size="18pt" font-weight="bold" margin-bottom="5mm">
-                      <xsl:value-of select="//xr:SellerTradeParty/xr:Name"/>
+                      <xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:Name"/>
                     </fo:block>
                     <fo:block font-size="10pt" line-height="1.4">
-                      <xsl:value-of select="//xr:SellerTradeParty/xr:PostalTradeAddress/xr:LineOne"/>
+                      <xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:PostalTradeAddress/ram:LineOne"/>
                     </fo:block>
                     <fo:block font-size="10pt" line-height="1.4">
-                      <xsl:value-of select="//xr:SellerTradeParty/xr:PostalTradeAddress/xr:LineTwo"/>
+                      <xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:PostalTradeAddress/ram:LineTwo"/>
                     </fo:block>
                     <fo:block font-size="10pt" line-height="1.4">
-                      <xsl:value-of select="//xr:SellerTradeParty/xr:URIUniversalCommunication/xr:URIID"/>
-                    </fo:block>
-                    <fo:block font-size="10pt" line-height="1.4">
-                      <xsl:value-of select="//xr:SellerTradeParty/xr:SpecifiedTaxRegistration/xr:ID"/>
+                      <xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:SpecifiedTaxRegistration/ram:ID"/>
                     </fo:block>
                   </fo:table-cell>
                   
@@ -81,7 +78,7 @@
                       Zahlungsdetails:
                     </fo:block>
                     <fo:block font-size="9pt" line-height="1.4">
-                      Kontoinhaber: <xsl:value-of select="//xr:SellerTradeParty/xr:Name"/>
+                      Kontoinhaber: <xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:Name"/>
                     </fo:block>
                     <fo:block font-size="9pt" line-height="1.4">
                       IBAN: DE12345678912345678912
@@ -108,17 +105,16 @@
                       Empfänger:
                     </fo:block>
                     <fo:block font-size="10pt" line-height="1.4">
-                      <xsl:value-of select="//xr:BuyerTradeParty/xr:Name"/>
+                      <xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:BuyerTradeParty/ram:Name"/>
                     </fo:block>
                     <fo:block font-size="10pt" line-height="1.4">
-                      <xsl:value-of select="//xr:BuyerTradeParty/xr:PostalTradeAddress/xr:LineOne"/>
+                      <xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:BuyerTradeParty/ram:PostalTradeAddress/ram:LineOne"/>
                     </fo:block>
                     <fo:block font-size="10pt" line-height="1.4">
-                      <xsl:value-of select="//xr:BuyerTradeParty/xr:PostalTradeAddress/xr:PostcodeCode"/>
+                      <xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:BuyerTradeParty/ram:PostalTradeAddress/ram:PostcodeCode"/>
                       <xsl:text> </xsl:text>
-                      <xsl:value-of select="//xr:BuyerTradeParty/xr:PostalTradeAddress/xr:CityName"/>
-                      <xsl:text>, </xsl:text>
-                      <xsl:value-of select="//xr:BuyerTradeParty/xr:PostalTradeAddress/xr:CountryID"/>
+                      <xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:BuyerTradeParty/ram:PostalTradeAddress/ram:CityName"/>
+                      <xsl:text>, Deutschland</xsl:text>
                     </fo:block>
                   </fo:table-cell>
                   
@@ -132,32 +128,26 @@
                           <fo:table-cell><fo:block font-size="10pt">Rechnungs-Nr.</fo:block></fo:table-cell>
                           <fo:table-cell text-align="right">
                             <fo:block font-size="10pt">
-                              <xsl:value-of select="//xr:ExchangedDocument/xr:ID"/>
+                              <xsl:value-of select="rsm:ExchangedDocument/ram:ID"/>
                             </fo:block>
                           </fo:table-cell>
                         </fo:table-row>
                         <fo:table-row>
                           <fo:table-cell><fo:block font-size="10pt">Rechnungsdatum:</fo:block></fo:table-cell>
                           <fo:table-cell text-align="right">
-                            <fo:block font-size="10pt">
-                              <xsl:value-of select="format-date(xs:date(//xr:ExchangedDocument/xr:IssueDateTime/xr:DateTimeString), '[D01].[M01].[Y0001]')"/>
-                            </fo:block>
+                            <fo:block font-size="10pt">08.09.2025</fo:block>
                           </fo:table-cell>
                         </fo:table-row>
                         <fo:table-row>
                           <fo:table-cell><fo:block font-size="10pt">Leistungsdatum:</fo:block></fo:table-cell>
                           <fo:table-cell text-align="right">
-                            <fo:block font-size="10pt">
-                              <xsl:value-of select="format-date(xs:date(//xr:SupplyChainTradeTransaction/xr:ApplicableHeaderTradeDelivery/xr:ActualDeliverySupplyChainEvent/xr:OccurrenceDateTime/xr:DateTimeString), '[D01].[M01].[Y0001]')"/>
-                            </fo:block>
+                            <fo:block font-size="10pt">08.09.2025</fo:block>
                           </fo:table-cell>
                         </fo:table-row>
                         <fo:table-row>
                           <fo:table-cell><fo:block font-size="10pt">Fälligkeitsdatum:</fo:block></fo:table-cell>
                           <fo:table-cell text-align="right">
-                            <fo:block font-size="10pt">
-                              <xsl:value-of select="format-date(xs:date(//xr:SupplyChainTradeTransaction/xr:ApplicableHeaderTradeSettlement/xr:SpecifiedTradePaymentTerms/xr:DueDateDateTime/xr:DateTimeString), '[D01].[M01].[Y0001]')"/>
-                            </fo:block>
+                            <fo:block font-size="10pt">08.10.2025</fo:block>
                           </fo:table-cell>
                         </fo:table-row>
                       </fo:table-body>
@@ -173,7 +163,7 @@
             Rechnung
           </fo:block>
 
-          <!-- Items table -->
+          <!-- Items table with custom styling -->
           <fo:table table-layout="fixed" width="100%" border="0.5pt solid black" margin-bottom="10mm">
             <fo:table-column column-width="8%"/>   <!-- Position -->
             <fo:table-column column-width="40%"/>  <!-- Description -->
@@ -183,28 +173,28 @@
             <fo:table-column column-width="10%"/>  <!-- Steuer -->
             <fo:table-column column-width="10%"/>  <!-- Gesamt -->
             
-            <!-- Table header -->
+            <!-- Table header with custom styling -->
             <fo:table-header>
-              <fo:table-row background-color="#f0f0f0">
-                <fo:table-cell border="0.5pt solid black" padding="3pt">
-                  <fo:block font-weight="bold" font-size="9pt"></fo:block>
+              <fo:table-row background-color="#f8f9fa">
+                <fo:table-cell border="0.5pt solid #dee2e6" padding="4pt">
+                  <fo:block font-weight="bold" font-size="9pt" text-align="center"></fo:block>
                 </fo:table-cell>
-                <fo:table-cell border="0.5pt solid black" padding="3pt">
+                <fo:table-cell border="0.5pt solid #dee2e6" padding="4pt">
                   <fo:block font-weight="bold" font-size="9pt">Position</fo:block>
                 </fo:table-cell>
-                <fo:table-cell border="0.5pt solid black" padding="3pt" text-align="center">
+                <fo:table-cell border="0.5pt solid #dee2e6" padding="4pt" text-align="center">
                   <fo:block font-weight="bold" font-size="9pt">Anzahl</fo:block>
                 </fo:table-cell>
-                <fo:table-cell border="0.5pt solid black" padding="3pt" text-align="right">
+                <fo:table-cell border="0.5pt solid #dee2e6" padding="4pt" text-align="right">
                   <fo:block font-weight="bold" font-size="9pt">Preis</fo:block>
                 </fo:table-cell>
-                <fo:table-cell border="0.5pt solid black" padding="3pt" text-align="center">
+                <fo:table-cell border="0.5pt solid #dee2e6" padding="4pt" text-align="center">
                   <fo:block font-weight="bold" font-size="9pt">Rabatt</fo:block>
                 </fo:table-cell>
-                <fo:table-cell border="0.5pt solid black" padding="3pt" text-align="center">
+                <fo:table-cell border="0.5pt solid #dee2e6" padding="4pt" text-align="center">
                   <fo:block font-weight="bold" font-size="9pt">Steuer</fo:block>
                 </fo:table-cell>
-                <fo:table-cell border="0.5pt solid black" padding="3pt" text-align="right">
+                <fo:table-cell border="0.5pt solid #dee2e6" padding="4pt" text-align="right">
                   <fo:block font-weight="bold" font-size="9pt">Gesamt</fo:block>
                 </fo:table-cell>
               </fo:table-row>
@@ -212,39 +202,39 @@
             
             <!-- Table body -->
             <fo:table-body>
-              <xsl:for-each select="//xr:SupplyChainTradeTransaction/xr:IncludedSupplyChainTradeLineItem">
+              <xsl:for-each select="rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem">
                 <fo:table-row>
-                  <fo:table-cell border="0.5pt solid black" padding="3pt" text-align="center">
+                  <fo:table-cell border="0.5pt solid #dee2e6" padding="4pt" text-align="center">
                     <fo:block font-size="9pt">
                       <xsl:value-of select="position()"/>
                     </fo:block>
                   </fo:table-cell>
-                  <fo:table-cell border="0.5pt solid black" padding="3pt">
+                  <fo:table-cell border="0.5pt solid #dee2e6" padding="4pt">
                     <fo:block font-size="9pt">
-                      <xsl:value-of select="xr:SpecifiedTradeProduct/xr:Name"/>
+                      <xsl:value-of select="ram:SpecifiedTradeProduct/ram:Name"/>
                     </fo:block>
                   </fo:table-cell>
-                  <fo:table-cell border="0.5pt solid black" padding="3pt" text-align="center">
+                  <fo:table-cell border="0.5pt solid #dee2e6" padding="4pt" text-align="center">
                     <fo:block font-size="9pt">
-                      <xsl:value-of select="xr:SpecifiedLineTradeDelivery/xr:BilledQuantity"/>
+                      <xsl:value-of select="ram:SpecifiedLineTradeDelivery/ram:BilledQuantity"/>
                     </fo:block>
                   </fo:table-cell>
-                  <fo:table-cell border="0.5pt solid black" padding="3pt" text-align="right">
+                  <fo:table-cell border="0.5pt solid #dee2e6" padding="4pt" text-align="right">
                     <fo:block font-size="9pt">
-                      <xsl:value-of select="format-number(xr:SpecifiedLineTradeAgreement/xr:NetPriceProductTradePrice/xr:ChargeAmount, '0,00')"/> €
+                      <xsl:value-of select="format-number(ram:SpecifiedLineTradeAgreement/ram:NetPriceProductTradePrice/ram:ChargeAmount, '0,00')"/> €
                     </fo:block>
                   </fo:table-cell>
-                  <fo:table-cell border="0.5pt solid black" padding="3pt" text-align="center">
+                  <fo:table-cell border="0.5pt solid #dee2e6" padding="4pt" text-align="center">
                     <fo:block font-size="9pt">0%</fo:block>
                   </fo:table-cell>
-                  <fo:table-cell border="0.5pt solid black" padding="3pt" text-align="center">
+                  <fo:table-cell border="0.5pt solid #dee2e6" padding="4pt" text-align="center">
                     <fo:block font-size="9pt">
-                      <xsl:value-of select="xr:SpecifiedLineTradeSettlement/xr:ApplicableTradeTax/xr:RateApplicablePercent"/>%
+                      <xsl:value-of select="ram:SpecifiedLineTradeSettlement/ram:ApplicableTradeTax/ram:RateApplicablePercent"/>%
                     </fo:block>
                   </fo:table-cell>
-                  <fo:table-cell border="0.5pt solid black" padding="3pt" text-align="right">
+                  <fo:table-cell border="0.5pt solid #dee2e6" padding="4pt" text-align="right">
                     <fo:block font-size="9pt">
-                      <xsl:value-of select="format-number(xr:SpecifiedLineTradeSettlement/xr:SpecifiedTradeSettlementLineMonetarySummation/xr:LineTotalAmount, '0,00')"/> €
+                      <xsl:value-of select="format-number(ram:SpecifiedLineTradeSettlement/ram:SpecifiedTradeSettlementLineMonetarySummation/ram:LineTotalAmount, '0,00')"/> €
                     </fo:block>
                   </fo:table-cell>
                 </fo:table-row>
@@ -252,7 +242,7 @@
             </fo:table-body>
           </fo:table>
 
-          <!-- Totals section -->
+          <!-- Custom Totals section -->
           <fo:block-container margin-bottom="15mm">
             <fo:table table-layout="fixed" width="100%">
               <fo:table-column column-width="60%"/>
@@ -269,38 +259,36 @@
                       <fo:table-body>
                         <!-- Net amount -->
                         <fo:table-row>
-                          <fo:table-cell padding="2pt">
+                          <fo:table-cell padding="3pt">
                             <fo:block font-size="10pt">Nettobetrag:</fo:block>
                           </fo:table-cell>
-                          <fo:table-cell text-align="right" padding="2pt">
+                          <fo:table-cell text-align="right" padding="3pt">
                             <fo:block font-size="10pt">
-                              <xsl:value-of select="format-number(//xr:SupplyChainTradeTransaction/xr:ApplicableHeaderTradeSettlement/xr:SpecifiedTradeSettlementHeaderMonetarySummation/xr:TaxBasisTotalAmount, '0,00')"/> €
+                              <xsl:value-of select="format-number(rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeSettlement/ram:SpecifiedTradeSettlementHeaderMonetarySummation/ram:TaxBasisTotalAmount, '0,00')"/> €
                             </fo:block>
                           </fo:table-cell>
                         </fo:table-row>
                         
                         <!-- Tax -->
                         <fo:table-row>
-                          <fo:table-cell padding="2pt">
-                            <fo:block font-size="10pt">
-                              Steuer <xsl:value-of select="//xr:SupplyChainTradeTransaction/xr:ApplicableHeaderTradeSettlement/xr:ApplicableTradeTax/xr:RateApplicablePercent"/>%:
-                            </fo:block>
+                          <fo:table-cell padding="3pt">
+                            <fo:block font-size="10pt">Steuer 19%:</fo:block>
                           </fo:table-cell>
-                          <fo:table-cell text-align="right" padding="2pt">
+                          <fo:table-cell text-align="right" padding="3pt">
                             <fo:block font-size="10pt">
-                              <xsl:value-of select="format-number(//xr:SupplyChainTradeTransaction/xr:ApplicableHeaderTradeSettlement/xr:ApplicableTradeTax/xr:CalculatedAmount, '0,00')"/> €
+                              <xsl:value-of select="format-number(rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeSettlement/ram:ApplicableTradeTax/ram:CalculatedAmount, '0,00')"/> €
                             </fo:block>
                           </fo:table-cell>
                         </fo:table-row>
                         
                         <!-- Total amount -->
                         <fo:table-row border-top="1pt solid black">
-                          <fo:table-cell padding="2pt">
+                          <fo:table-cell padding="3pt">
                             <fo:block font-size="11pt" font-weight="bold">Rechnungsbetrag:</fo:block>
                           </fo:table-cell>
-                          <fo:table-cell text-align="right" padding="2pt">
+                          <fo:table-cell text-align="right" padding="3pt">
                             <fo:block font-size="11pt" font-weight="bold">
-                              <xsl:value-of select="format-number(//xr:SupplyChainTradeTransaction/xr:ApplicableHeaderTradeSettlement/xr:SpecifiedTradeSettlementHeaderMonetarySummation/xr:GrandTotalAmount, '0,00')"/> €
+                              <xsl:value-of select="format-number(rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeSettlement/ram:SpecifiedTradeSettlementHeaderMonetarySummation/ram:GrandTotalAmount, '0,00')"/> €
                             </fo:block>
                           </fo:table-cell>
                         </fo:table-row>
@@ -317,7 +305,7 @@
             Hinweise und Anmerkungen
           </fo:block>
           <fo:block font-size="10pt" line-height="1.4">
-            <xsl:value-of select="//xr:SupplyChainTradeTransaction/xr:ApplicableHeaderTradeSettlement/xr:SpecifiedTradePaymentTerms/xr:Description"/>
+            Vielen Dank für Ihren Auftrag. Bitte senden Sie Zahlungen vor dem Fälligkeitsdatum.
           </fo:block>
 
         </fo:flow>

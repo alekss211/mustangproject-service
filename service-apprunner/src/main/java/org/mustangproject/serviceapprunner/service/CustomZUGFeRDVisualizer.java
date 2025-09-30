@@ -19,25 +19,15 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
 
     public CustomZUGFeRDVisualizer() {
         super(); // Initialize parent ZUGFeRDVisualizer
-        logger.info("CustomZUGFeRDVisualizer initialized with custom PDF template");
-        
-        // Test if custom template is accessible during initialization
-        InputStream testStream = CLASS_LOADER.getResourceAsStream("stylesheets/custom-invoice-layout-standalone.xsl");
-        if (testStream != null) {
-            logger.info("Custom XSL template found and accessible during initialization");
-            try {
-                testStream.close();
-            } catch (Exception e) {
-                logger.warn("Failed to close test stream", e);
-            }
-        } else {
-            logger.warn("Custom XSL template NOT found during initialization - will fall back to default");
-        }
+        logger.info("CustomZUGFeRDVisualizer initialized - using default XRechnung layout");
     }
 
     /**
-     * Override the toFOP method to use our custom template for FOP generation
+     * Use the default XRechnung layout - no custom template override
+     * This will use the built-in Mustang XRechnung template
      */
+    // Commented out custom template override - using default XRechnung layout
+    /*
     @Override
     protected String toFOP(java.io.InputStream is, org.mustangproject.EStandard theStandard)
         throws javax.xml.transform.TransformerException, java.io.IOException {
@@ -106,12 +96,13 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
             return super.toFOP(is, theStandard);
         }
     }
+    */
 
     /**
-     * Generate PDF from XML content using our custom template
+     * Generate PDF from XML content using the default XRechnung layout
      */
     public byte[] toPDF(String xmlContent) {
-        logger.info("=== CustomZUGFeRDVisualizer: Generating PDF with custom layout ===");
+        logger.info("=== CustomZUGFeRDVisualizer: Generating PDF with default XRechnung layout ===");
         logger.info("Input XML content length: {} characters", xmlContent != null ? xmlContent.length() : 0);
         
         if (xmlContent == null || xmlContent.trim().isEmpty()) {
@@ -158,7 +149,7 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
             // Log the full stack trace for debugging
             logger.error("Full stack trace:", e);
             
-            throw new RuntimeException("Failed to generate PDF with custom layout: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to generate PDF with default XRechnung layout: " + e.getMessage(), e);
         }
     }
 }
