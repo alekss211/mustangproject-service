@@ -92,11 +92,19 @@ public class ZUGFeRDGenerationService {
         logger.info("Setting invoice number: {}", dto.getInvoiceNumber());
         invoice.setNumber(dto.getInvoiceNumber());
         
-        logger.info("Setting dates - issue: {}, delivery: {}, due: {}", 
+        logger.info("Setting dates - invoice: {}, issue: {}, due: {}", 
             dto.getInvoiceDate(), dto.getIssueDate(), dto.getDueDate());
-        invoice.setIssueDate(localDateToDate(parseDate(dto.getInvoiceDate())));
-        invoice.setDeliveryDate(localDateToDate(parseDate(dto.getIssueDate())));
-        invoice.setDueDate(localDateToDate(parseDate(dto.getDueDate())));
+        
+        LocalDate invoiceDate = parseDate(dto.getInvoiceDate());
+        LocalDate issueDate = parseDate(dto.getIssueDate());
+        LocalDate dueDate = parseDate(dto.getDueDate());
+        
+        logger.info("Parsed dates - invoice: {}, issue: {}, due: {}", 
+            invoiceDate, issueDate, dueDate);
+        
+        invoice.setIssueDate(localDateToDate(invoiceDate));
+        invoice.setDeliveryDate(localDateToDate(issueDate));
+        invoice.setDueDate(localDateToDate(dueDate));
         
         // Set seller information (company)
         logger.info("Setting seller information: name={}, street={}", 
@@ -171,11 +179,13 @@ public class ZUGFeRDGenerationService {
         
         try {
             // Use the Mustang library's ZUGFeRD2PullProvider to generate proper XML
+            logger.info("Creating ZUGFeRD2PullProvider...");
             ZUGFeRD2PullProvider xmlProvider = new ZUGFeRD2PullProvider();
-            logger.debug("ZUGFeRD2PullProvider created successfully");
+            logger.info("ZUGFeRD2PullProvider created successfully");
             
+            logger.info("Calling xmlProvider.generateXML(invoice)...");
             xmlProvider.generateXML(invoice);
-            logger.debug("XML generation from invoice completed");
+            logger.info("XML generation from invoice completed successfully");
             
             byte[] xmlBytes = xmlProvider.getXML();
             if (xmlBytes == null) {
@@ -234,7 +244,10 @@ public class ZUGFeRDGenerationService {
     }
     
     private LocalDate parseDate(String dateString) {
+        logger.debug("Parsing date string: '{}'", dateString);
+        
         if (dateString == null || dateString.isEmpty()) {
+            logger.warn("Date string is null or empty, using current date");
             return LocalDate.now();
         }
         
@@ -248,13 +261,18 @@ public class ZUGFeRDGenerationService {
         
         for (DateTimeFormatter formatter : formatters) {
             try {
-                return LocalDate.parse(dateString, formatter);
+                LocalDate result = LocalDate.parse(dateString, formatter);
+                logger.debug("Successfully parsed '{}' using format '{}' -> {}", 
+                    dateString, formatter.toString(), result);
+                return result;
             } catch (Exception e) {
-                // Continue to next format
+                logger.debug("Failed to parse '{}' with format '{}': {}", 
+                    dateString, formatter.toString(), e.getMessage());
             }
         }
         
         // If no format works, return current date
+        logger.warn("Could not parse date '{}' with any format, using current date", dateString);
         return LocalDate.now();
     }
     

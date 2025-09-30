@@ -86,9 +86,15 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
             }
             
             // Apply our custom template to generate FOP
+            logger.info("Creating ByteArrayOutputStream for FOP output...");
             java.io.ByteArrayOutputStream fopOutput = new java.io.ByteArrayOutputStream();
+            
+            logger.info("Creating transformer from custom template...");
             javax.xml.transform.Transformer transformer = mXsltCustomPDFTemplate.newTransformer();
+            
+            logger.info("Applying XSLT transformation to generate FOP...");
             transformer.transform(new StreamSource(is), new StreamResult(fopOutput));
+            logger.info("XSLT transformation completed successfully");
             
             String fopResult = fopOutput.toString("UTF-8");
             logger.info("Custom FOP generation completed successfully. Generated {} characters", fopResult.length());
