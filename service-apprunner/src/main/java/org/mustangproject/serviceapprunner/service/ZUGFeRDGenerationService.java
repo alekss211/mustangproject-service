@@ -44,10 +44,27 @@ public class ZUGFeRDGenerationService {
             // Create PDF from XML using CustomZUGFeRDVisualizer
             logger.info("Creating PDF from XML using CustomZUGFeRDVisualizer...");
             stepStart = System.currentTimeMillis();
-            CustomZUGFeRDVisualizer visualizer = new CustomZUGFeRDVisualizer();
-            byte[] pdfBytes = visualizer.toPDF(xmlContent);
-            logger.info("PDF creation completed in {}ms. Generated {} bytes", 
-                System.currentTimeMillis() - stepStart, pdfBytes.length);
+            
+            byte[] pdfBytes = null;
+            try {
+                CustomZUGFeRDVisualizer visualizer = new CustomZUGFeRDVisualizer();
+                pdfBytes = visualizer.toPDF(xmlContent);
+                logger.info("PDF creation with CustomZUGFeRDVisualizer completed in {}ms. Generated {} bytes", 
+                    System.currentTimeMillis() - stepStart, pdfBytes.length);
+            } catch (Exception customVisualizerException) {
+                logger.error("CustomZUGFeRDVisualizer failed, trying default ZUGFeRDVisualizer", customVisualizerException);
+                
+                // Fallback to default ZUGFeRDVisualizer
+                try {
+                    org.mustangproject.ZUGFeRD.ZUGFeRDVisualizer defaultVisualizer = new org.mustangproject.ZUGFeRD.ZUGFeRDVisualizer();
+                    pdfBytes = defaultVisualizer.toPDF(xmlContent);
+                    logger.info("PDF creation with default ZUGFeRDVisualizer completed in {}ms. Generated {} bytes", 
+                        System.currentTimeMillis() - stepStart, pdfBytes.length);
+                } catch (Exception defaultVisualizerException) {
+                    logger.error("Both custom and default visualizers failed", defaultVisualizerException);
+                    throw new Exception("PDF generation failed with both custom and default visualizers", defaultVisualizerException);
+                }
+            }
             
             if (pdfBytes.length == 0) {
                 logger.error("Generated PDF is empty!");
@@ -147,17 +164,45 @@ public class ZUGFeRDGenerationService {
     private String generateXMLFromInvoice(Invoice invoice) throws Exception {
         logger.info("Converting Invoice to XML using ZUGFeRD2PullProvider...");
         
-        // Use the Mustang library's ZUGFeRD2PullProvider to generate proper XML
-        ZUGFeRD2PullProvider xmlProvider = new ZUGFeRD2PullProvider();
-        xmlProvider.generateXML(invoice);
+        if (invoice == null) {
+            logger.error("Invoice object is null - cannot generate XML");
+            throw new IllegalArgumentException("Invoice cannot be null");
+        }
         
-        byte[] xmlBytes = xmlProvider.getXML();
-        String xmlContent = new String(xmlBytes, java.nio.charset.StandardCharsets.UTF_8);
-        
-        logger.info("XML generation completed. Generated XML with {} characters", xmlContent.length());
-        logger.debug("Generated XML content: {}", xmlContent);
-        
-        return xmlContent;
+        try {
+            // Use the Mustang library's ZUGFeRD2PullProvider to generate proper XML
+            ZUGFeRD2PullProvider xmlProvider = new ZUGFeRD2PullProvider();
+            logger.debug("ZUGFeRD2PullProvider created successfully");
+            
+            xmlProvider.generateXML(invoice);
+            logger.debug("XML generation from invoice completed");
+            
+            byte[] xmlBytes = xmlProvider.getXML();
+            if (xmlBytes == null) {
+                logger.error("ZUGFeRD2PullProvider returned null XML bytes");
+                throw new RuntimeException("XML generation failed - null result from provider");
+            }
+            
+            if (xmlBytes.length == 0) {
+                logger.error("ZUGFeRD2PullProvider returned empty XML bytes");
+                throw new RuntimeException("XML generation failed - empty result from provider");
+            }
+            
+            String xmlContent = new String(xmlBytes, java.nio.charset.StandardCharsets.UTF_8);
+            
+            logger.info("XML generation completed. Generated XML with {} characters", xmlContent.length());
+            
+            // Log first 1000 characters for debugging
+            String xmlPreview = xmlContent.length() > 1000 ? xmlContent.substring(0, 1000) + "..." : xmlContent;
+            logger.debug("Generated XML content preview: {}", xmlPreview);
+            
+            return xmlContent;
+            
+        } catch (Exception e) {
+            logger.error("Failed to generate XML from invoice - Exception type: {}, Message: {}", 
+                e.getClass().getSimpleName(), e.getMessage(), e);
+            throw new Exception("XML generation failed: " + e.getMessage(), e);
+        }
     }
     
     private LocalDate parseDate(String dateString) {
