@@ -192,9 +192,37 @@ public class ZUGFeRDGenerationService {
             
             logger.info("XML generation completed. Generated XML with {} characters", xmlContent.length());
             
-            // Log first 1000 characters for debugging
-            String xmlPreview = xmlContent.length() > 1000 ? xmlContent.substring(0, 1000) + "..." : xmlContent;
-            logger.debug("Generated XML content preview: {}", xmlPreview);
+            // Debug XML content thoroughly
+            if (xmlContent.isEmpty()) {
+                logger.error("XML content is EMPTY!");
+                throw new RuntimeException("Generated XML is empty");
+            }
+            
+            // Check for BOM or invisible characters at the start
+            char firstChar = xmlContent.charAt(0);
+            int firstCharCode = (int) firstChar;
+            logger.info("First character of XML: '{}' (ASCII: {})", firstChar, firstCharCode);
+            
+            // Log first 500 characters with escape sequences visible
+            String xmlPreview = xmlContent.length() > 500 ? xmlContent.substring(0, 500) + "..." : xmlContent;
+            logger.info("Generated XML content preview (first 500 chars): {}", xmlPreview);
+            
+            // Check if XML starts properly
+            if (!xmlContent.trim().startsWith("<?xml")) {
+                logger.error("XML does not start with proper XML declaration!");
+                logger.error("XML starts with: '{}'", xmlContent.substring(0, Math.min(100, xmlContent.length())));
+                
+                // Try to find where actual XML starts
+                int xmlStart = xmlContent.indexOf("<?xml");
+                if (xmlStart > 0) {
+                    logger.warn("Found XML declaration at position {}. Trimming invalid content before it.", xmlStart);
+                    xmlContent = xmlContent.substring(xmlStart);
+                    logger.info("Trimmed XML now starts with: '{}'", xmlContent.substring(0, Math.min(100, xmlContent.length())));
+                }
+            }
+            
+            // Clean up the XML content to ensure it's valid
+            xmlContent = cleanXMLContent(xmlContent);
             
             return xmlContent;
             
@@ -232,5 +260,45 @@ public class ZUGFeRDGenerationService {
     
     private Date localDateToDate(LocalDate localDate) {
         return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+    
+    /**
+     * Clean XML content to remove BOM, invalid characters, and ensure proper format
+     */
+    private String cleanXMLContent(String xmlContent) {
+        if (xmlContent == null || xmlContent.isEmpty()) {
+            return xmlContent;
+        }
+        
+        logger.debug("Cleaning XML content...");
+        
+        // Remove BOM (Byte Order Mark) if present
+        if (xmlContent.startsWith("\uFEFF")) {
+            logger.warn("Removing BOM from XML content");
+            xmlContent = xmlContent.substring(1);
+        }
+        
+        // Remove any leading whitespace or control characters
+        String originalStart = xmlContent.substring(0, Math.min(50, xmlContent.length()));
+        xmlContent = xmlContent.trim();
+        
+        if (!originalStart.equals(xmlContent.substring(0, Math.min(50, xmlContent.length())))) {
+            logger.info("Trimmed leading whitespace from XML content");
+        }
+        
+        // Ensure XML starts with proper declaration
+        if (!xmlContent.startsWith("<?xml")) {
+            logger.error("XML content does not start with XML declaration after cleaning");
+            // Log the first 200 characters in hex format for debugging
+            StringBuilder hexDump = new StringBuilder();
+            for (int i = 0; i < Math.min(200, xmlContent.length()); i++) {
+                char c = xmlContent.charAt(i);
+                hexDump.append(String.format("%02X ", (int) c));
+                if ((i + 1) % 16 == 0) hexDump.append("\n");
+            }
+            logger.error("XML content hex dump (first 200 chars):\n{}", hexDump.toString());
+        }
+        
+        return xmlContent;
     }
 }

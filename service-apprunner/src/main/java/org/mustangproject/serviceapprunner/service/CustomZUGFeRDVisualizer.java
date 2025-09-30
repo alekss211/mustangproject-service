@@ -113,9 +113,20 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
             throw new IllegalArgumentException("XML content cannot be null or empty");
         }
         
+        // Debug XML content thoroughly
+        char firstChar = xmlContent.charAt(0);
+        int firstCharCode = (int) firstChar;
+        logger.info("CustomZUGFeRDVisualizer - First character of XML: '{}' (ASCII: {})", firstChar, firstCharCode);
+        
+        // Check if XML starts properly
+        if (!xmlContent.trim().startsWith("<?xml")) {
+            logger.error("CustomZUGFeRDVisualizer - XML does not start with proper XML declaration!");
+            logger.error("XML starts with: '{}'", xmlContent.substring(0, Math.min(100, xmlContent.length())));
+        }
+        
         // Log first 500 characters of XML for debugging
         String xmlPreview = xmlContent.length() > 500 ? xmlContent.substring(0, 500) + "..." : xmlContent;
-        logger.debug("XML content preview: {}", xmlPreview);
+        logger.info("CustomZUGFeRDVisualizer - XML content preview: {}", xmlPreview);
         
         try {
             logger.info("Calling parent toPDF method...");
