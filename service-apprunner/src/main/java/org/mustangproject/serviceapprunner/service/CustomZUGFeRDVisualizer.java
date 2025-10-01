@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.mustangproject.ZUGFeRD.ZUGFeRDVisualizer;
 
 import javax.xml.transform.Templates;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.InputStream;
@@ -19,28 +18,25 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
 
     public CustomZUGFeRDVisualizer() {
         super(); // Initialize parent ZUGFeRDVisualizer
-        logger.info("CustomZUGFeRDVisualizer initialized - using default XRechnung layout");
+        logger.info("CustomZUGFeRDVisualizer initialized - using minimal layout");
     }
 
     /**
-     * Use the default XRechnung layout - no custom template override
-     * This will use the built-in Mustang XRechnung template
+     * Use the minimal layout template for clean, simple invoice generation
      */
-    // Commented out custom template override - using default XRechnung layout
-    /*
     @Override
     protected String toFOP(java.io.InputStream is, org.mustangproject.EStandard theStandard)
         throws javax.xml.transform.TransformerException, java.io.IOException {
         
-        logger.info("Using custom template for FOP generation");
+        logger.info("Using minimal layout template for FOP generation");
         
         try {
-            // Load our custom PDF template instead of the default one
+            // Load our minimal PDF template instead of the default one
             if (mXsltCustomPDFTemplate == null) {
-                logger.info("Loading custom PDF template: stylesheets/custom-invoice-layout-standalone.xsl");
-                InputStream templateStream = CLASS_LOADER.getResourceAsStream("stylesheets/custom-invoice-layout-standalone.xsl");
+                logger.info("Loading minimal PDF template: stylesheets/layout-minimal.xsl");
+                InputStream templateStream = CLASS_LOADER.getResourceAsStream("stylesheets/layout-minimal.xsl");
                 if (templateStream == null) {
-                    logger.warn("Custom template not found, falling back to default template");
+                    logger.warn("Minimal template not found, falling back to default template");
                     return super.toFOP(is, theStandard);
                 }
                 
@@ -56,9 +52,9 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
                         return super.toFOP(is, theStandard);
                     }
                     
-                    logger.debug("Creating templates from custom XSL stream...");
+                    logger.debug("Creating templates from minimal XSL stream...");
                     mXsltCustomPDFTemplate = factory.newTemplates(new StreamSource(templateStream));
-                    logger.info("Custom PDF template loaded successfully");
+                    logger.info("Minimal PDF template loaded successfully");
                     
                     // Close the stream
                     templateStream.close();
@@ -75,11 +71,11 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
                 }
             }
             
-            // Apply our custom template to generate FOP
+            // Apply our minimal template to generate FOP
             logger.info("Creating ByteArrayOutputStream for FOP output...");
             java.io.ByteArrayOutputStream fopOutput = new java.io.ByteArrayOutputStream();
             
-            logger.info("Creating transformer from custom template...");
+            logger.info("Creating transformer from minimal template...");
             javax.xml.transform.Transformer transformer = mXsltCustomPDFTemplate.newTransformer();
             
             logger.info("Applying XSLT transformation to generate FOP...");
@@ -87,22 +83,21 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
             logger.info("XSLT transformation completed successfully");
             
             String fopResult = fopOutput.toString("UTF-8");
-            logger.info("Custom FOP generation completed successfully. Generated {} characters", fopResult.length());
+            logger.info("Minimal FOP generation completed successfully. Generated {} characters", fopResult.length());
             
             return fopResult;
             
         } catch (Exception e) {
-            logger.error("Failed to generate FOP with custom template, falling back to default", e);
+            logger.error("Failed to generate FOP with minimal template, falling back to default", e);
             return super.toFOP(is, theStandard);
         }
     }
-    */
 
     /**
-     * Generate PDF from XML content using the default XRechnung layout
+     * Generate PDF from XML content using the minimal layout
      */
     public byte[] toPDF(String xmlContent) {
-        logger.info("=== CustomZUGFeRDVisualizer: Generating PDF with default XRechnung layout ===");
+        logger.info("=== CustomZUGFeRDVisualizer: Generating PDF with minimal layout ===");
         logger.info("Input XML content length: {} characters", xmlContent != null ? xmlContent.length() : 0);
         
         if (xmlContent == null || xmlContent.trim().isEmpty()) {
@@ -149,7 +144,7 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
             // Log the full stack trace for debugging
             logger.error("Full stack trace:", e);
             
-            throw new RuntimeException("Failed to generate PDF with default XRechnung layout: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to generate PDF with minimal layout: " + e.getMessage(), e);
         }
     }
 }
