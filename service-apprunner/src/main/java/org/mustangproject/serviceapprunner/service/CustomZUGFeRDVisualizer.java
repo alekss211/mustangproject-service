@@ -15,29 +15,29 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
     private static final ClassLoader CLASS_LOADER = CustomZUGFeRDVisualizer.class.getClassLoader();
     
     private Templates mXsltCustomPDFTemplate = null;
-
+    
     public CustomZUGFeRDVisualizer() {
         super(); // Initialize parent ZUGFeRDVisualizer
-        logger.info("CustomZUGFeRDVisualizer initialized - using minimal layout");
+        logger.info("CustomZUGFeRDVisualizer initialized - using modern layout");
     }
 
     /**
-     * Use the minimal layout template for clean, simple invoice generation
+     * Use the modern layout template for professional invoice generation
      */
     @Override
     protected String toFOP(java.io.InputStream is, org.mustangproject.EStandard theStandard)
         throws javax.xml.transform.TransformerException, java.io.IOException {
         
-        logger.info("Using minimal layout template for FOP generation");
+        logger.info("Using modern layout template for FOP generation");
         
         try {
-            // Load our minimal PDF template instead of the default one
+            // Load our modern PDF template instead of the default one
             if (mXsltCustomPDFTemplate == null) {
-                logger.info("Loading minimal PDF template: stylesheets/layout-minimal.xsl");
-                InputStream templateStream = CLASS_LOADER.getResourceAsStream("stylesheets/layout-minimal.xsl");
+                logger.info("Loading modern PDF template: stylesheets/layout-modern.xsl");
+                InputStream templateStream = CLASS_LOADER.getResourceAsStream("stylesheets/layout-modern.xsl");
                 if (templateStream == null) {
-                    logger.error("Minimal template not found on classpath: stylesheets/layout-minimal.xsl");
-                    throw new RuntimeException("Minimal template not found on classpath: stylesheets/layout-minimal.xsl");
+                    logger.error("Modern template not found on classpath: stylesheets/layout-modern.xsl");
+                    throw new RuntimeException("Modern template not found on classpath: stylesheets/layout-modern.xsl");
                 }
                 
                 // Use reflection to access the private mFactory field
@@ -51,9 +51,9 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
                         throw new RuntimeException("TransformerFactory is null - cannot create template");
                     }
                     
-                    logger.debug("Creating templates from minimal XSL stream...");
+                    logger.debug("Creating templates from modern XSL stream...");
                     mXsltCustomPDFTemplate = factory.newTemplates(new StreamSource(templateStream));
-                    logger.info("Minimal PDF template loaded successfully");
+                    logger.info("Modern PDF template loaded successfully");
                     
                     // Close the stream
                     templateStream.close();
@@ -69,11 +69,11 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
                 }
             }
             
-            // Apply our minimal template to generate FOP
+            // Apply our modern template to generate FOP
             logger.info("Creating ByteArrayOutputStream for FOP output...");
             java.io.ByteArrayOutputStream fopOutput = new java.io.ByteArrayOutputStream();
             
-            logger.info("Creating transformer from minimal template...");
+            logger.info("Creating transformer from modern template...");
             javax.xml.transform.Transformer transformer = mXsltCustomPDFTemplate.newTransformer();
             
             logger.info("Applying XSLT transformation to generate FOP...");
@@ -81,7 +81,7 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
             logger.info("XSLT transformation completed successfully");
             
             String fopResult = fopOutput.toString("UTF-8");
-            logger.info("Minimal FOP generation completed successfully. Generated {} characters", fopResult.length());
+            logger.info("Modern FOP generation completed successfully. Generated {} characters", fopResult.length());
             
             return fopResult;
             

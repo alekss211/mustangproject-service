@@ -11,7 +11,7 @@
   <xsl:param name="foengine"/>
 
   <xsl:template match="rsm:CrossIndustryInvoice">
-    <fo:root font-family="Helvetica, Arial, sans-serif">
+    <fo:root font-family="SourceSansPro">
       <fo:layout-master-set>
         <fo:simple-page-master master-name="modern" page-height="297mm" page-width="210mm">
           <fo:region-body margin="20mm 15mm 25mm 15mm"/>
