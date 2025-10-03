@@ -45,26 +45,11 @@ public class ZUGFeRDGenerationService {
             logger.info("Creating PDF from XML using CustomZUGFeRDVisualizer...");
             stepStart = System.currentTimeMillis();
             
-            byte[] pdfBytes = null;
-            try {
-                CustomZUGFeRDVisualizer visualizer = new CustomZUGFeRDVisualizer();
-                pdfBytes = visualizer.toPDF(xmlContent);
-                logger.info("PDF creation with CustomZUGFeRDVisualizer completed in {}ms. Generated {} bytes", 
-                    System.currentTimeMillis() - stepStart, pdfBytes.length);
-            } catch (Exception customVisualizerException) {
-                logger.error("CustomZUGFeRDVisualizer failed, trying default ZUGFeRDVisualizer", customVisualizerException);
-                
-                // Fallback to default ZUGFeRDVisualizer
-                try {
-                    org.mustangproject.ZUGFeRD.ZUGFeRDVisualizer defaultVisualizer = new org.mustangproject.ZUGFeRD.ZUGFeRDVisualizer();
-                    pdfBytes = defaultVisualizer.toPDF(xmlContent);
-                    logger.info("PDF creation with default ZUGFeRDVisualizer completed in {}ms. Generated {} bytes", 
-                        System.currentTimeMillis() - stepStart, pdfBytes.length);
-                } catch (Exception defaultVisualizerException) {
-                    logger.error("Both custom and default visualizers failed", defaultVisualizerException);
-                    throw new Exception("PDF generation failed with both custom and default visualizers", defaultVisualizerException);
-                }
-            }
+            byte[] pdfBytes;
+            CustomZUGFeRDVisualizer visualizer = new CustomZUGFeRDVisualizer();
+            pdfBytes = visualizer.toPDF(xmlContent);
+            logger.info("PDF creation with CustomZUGFeRDVisualizer (minimal layout) completed in {}ms. Generated {} bytes", 
+                System.currentTimeMillis() - stepStart, pdfBytes.length);
             
             if (pdfBytes.length == 0) {
                 logger.error("Generated PDF is empty!");

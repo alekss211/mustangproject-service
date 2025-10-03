@@ -36,8 +36,8 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
                 logger.info("Loading minimal PDF template: stylesheets/layout-minimal.xsl");
                 InputStream templateStream = CLASS_LOADER.getResourceAsStream("stylesheets/layout-minimal.xsl");
                 if (templateStream == null) {
-                    logger.warn("Minimal template not found, falling back to default template");
-                    return super.toFOP(is, theStandard);
+                    logger.error("Minimal template not found on classpath: stylesheets/layout-minimal.xsl");
+                    throw new RuntimeException("Minimal template not found on classpath: stylesheets/layout-minimal.xsl");
                 }
                 
                 // Use reflection to access the private mFactory field
@@ -48,8 +48,7 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
                     
                     if (factory == null) {
                         logger.error("TransformerFactory is null - cannot create template");
-                        logger.info("Falling back to default parent template...");
-                        return super.toFOP(is, theStandard);
+                        throw new RuntimeException("TransformerFactory is null - cannot create template");
                     }
                     
                     logger.debug("Creating templates from minimal XSL stream...");
@@ -61,13 +60,12 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
                     
                 } catch (Exception e) {
                     logger.error("Failed to access TransformerFactory or create template", e);
-                    logger.info("Falling back to default parent template...");
                     try {
                         if (templateStream != null) templateStream.close();
                     } catch (Exception closeEx) {
                         logger.warn("Failed to close template stream", closeEx);
                     }
-                    return super.toFOP(is, theStandard);
+                    throw new RuntimeException("Failed to prepare minimal layout template", e);
                 }
             }
             
@@ -88,8 +86,8 @@ public class CustomZUGFeRDVisualizer extends ZUGFeRDVisualizer {
             return fopResult;
             
         } catch (Exception e) {
-            logger.error("Failed to generate FOP with minimal template, falling back to default", e);
-            return super.toFOP(is, theStandard);
+            logger.error("Failed to generate FOP with minimal template", e);
+            throw e;
         }
     }
 
