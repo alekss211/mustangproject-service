@@ -28,52 +28,30 @@
         
         <fo:flow flow-name="xsl-region-body">
           
-          <!-- Modern Header with Color Accent -->
-          <fo:block-container background-color="#2c3e50" color="white" padding="15pt" margin-bottom="20mm">
-            <fo:table width="100%">
-              <fo:table-column column-width="70%"/>
-              <fo:table-column column-width="30%"/>
-              <fo:table-body>
-                <fo:table-row>
-                  <fo:table-cell>
-                    <fo:block font-size="28pt" font-weight="bold">RECHNUNG</fo:block>
-                    <fo:block font-size="12pt" margin-top="5pt">
-                      Nr. <xsl:value-of select="rsm:ExchangedDocument/ram:ID"/>
-                    </fo:block>
-                  </fo:table-cell>
-                  <fo:table-cell text-align="right">
-                    <fo:block font-size="14pt" font-weight="bold">
-                      <xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:Name"/>
-                    </fo:block>
-                  </fo:table-cell>
-                </fo:table-row>
-              </fo:table-body>
-            </fo:table>
-          </fo:block-container>
+          <!-- Simple Header -->
+          <fo:block font-size="24pt" font-weight="bold" margin-bottom="10mm" text-align="left">
+            RECHNUNG
+          </fo:block>
+          <fo:block font-size="12pt" margin-bottom="20mm">
+            Nr. <xsl:value-of select="rsm:ExchangedDocument/ram:ID"/>
+          </fo:block>
           
           <!-- Business Info Cards -->
-          <fo:table width="100%" margin-bottom="20mm">
-            <fo:table-column column-width="48%"/>
-            <fo:table-column column-width="4%"/>
-            <fo:table-column column-width="48%"/>
-            <fo:table-body>
-              <fo:table-row>
-                <!-- Sender Card -->
-                <fo:table-cell border="1pt solid #ecf0f1" background-color="#f8f9fa" padding="10pt">
-                  <fo:block font-weight="bold" color="#2c3e50" margin-bottom="5pt">RECHNUNGSSTELLER</fo:block>
-                  <fo:block><xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:Name"/></fo:block>
-                  <fo:block><xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:PostalTradeAddress/ram:LineOne"/></fo:block>
-                </fo:table-cell>
-                <fo:table-cell><fo:block></fo:block></fo:table-cell>
-                <!-- Recipient Card -->
-                <fo:table-cell border="1pt solid #ecf0f1" background-color="#f8f9fa" padding="10pt">
-                  <fo:block font-weight="bold" color="#2c3e50" margin-bottom="5pt">RECHNUNGSEMPFÄNGER</fo:block>
-                  <fo:block><xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:BuyerTradeParty/ram:Name"/></fo:block>
-                  <fo:block><xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:BuyerTradeParty/ram:PostalTradeAddress/ram:LineOne"/></fo:block>
-                </fo:table-cell>
-              </fo:table-row>
-            </fo:table-body>
-          </fo:table>
+          <fo:block-container margin-bottom="20mm">
+            <!-- Sender Card -->
+            <fo:block border="1pt solid #ecf0f1" background-color="#f8f9fa" padding="10pt" margin-bottom="15mm">
+              <fo:block font-weight="bold" color="#2c3e50" margin-bottom="5pt">RECHNUNGSSTELLER</fo:block>
+              <fo:block><xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:Name"/></fo:block>
+              <fo:block><xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:PostalTradeAddress/ram:LineOne"/></fo:block>
+            </fo:block>
+
+            <!-- Recipient Card -->
+            <fo:block border="1pt solid #ecf0f1" background-color="#f8f9fa" padding="10pt">
+              <fo:block font-weight="bold" color="#2c3e50" margin-bottom="5pt">RECHNUNGSEMPFÄNGER</fo:block>
+              <fo:block><xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:BuyerTradeParty/ram:Name"/></fo:block>
+              <fo:block><xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:BuyerTradeParty/ram:PostalTradeAddress/ram:LineOne"/></fo:block>
+            </fo:block>
+          </fo:block-container>
           
           <!-- Modern Items Table -->
           <fo:table width="100%" border-collapse="separate" border-spacing="0">
