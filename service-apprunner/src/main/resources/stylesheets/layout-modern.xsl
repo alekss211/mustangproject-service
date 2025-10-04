@@ -30,7 +30,19 @@
           
           <!-- Simple Header -->
           <fo:block font-size="24pt" font-weight="bold" margin-bottom="10mm" text-align="left">
-            RECHNUNG
+            <xsl:choose>
+              <xsl:when test="rsm:ExchangedDocument/ram:IssueDateTime/udt:DateTimeString">
+                <xsl:variable name="dateValue" select="rsm:ExchangedDocument/ram:IssueDateTime/udt:DateTimeString"/>
+                <xsl:variable name="year" select="substring($dateValue, 1, 4)"/>
+                <xsl:variable name="month" select="substring($dateValue, 5, 2)"/>
+                <xsl:variable name="day" select="substring($dateValue, 7, 2)"/>
+                <xsl:text>RECHNUNG vom </xsl:text>
+                <xsl:value-of select="concat($day, '.', $month, '.', $year)"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>RECHNUNG</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
           </fo:block>
           <fo:block font-size="12pt" margin-bottom="20mm">
             Nr. <xsl:value-of select="rsm:ExchangedDocument/ram:ID"/>
@@ -106,40 +118,22 @@
               </xsl:for-each>
             </fo:table-body>
           </fo:table>
-          
-          <!-- Modern Total Section -->
-          <fo:block-container margin-top="15mm" width="60%" margin-left="40%">
-            <fo:table width="100%">
-              <fo:table-column column-width="60%"/>
-              <fo:table-column column-width="40%"/>
-              <fo:table-body>
-                <fo:table-row>
-                  <fo:table-cell padding="5pt">
-                    <fo:block>Nettobetrag:</fo:block>
-                  </fo:table-cell>
-                  <fo:table-cell padding="5pt" text-align="right">
-                    <fo:block><xsl:value-of select="format-number(rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeSettlement/ram:SpecifiedTradeSettlementHeaderMonetarySummation/ram:TaxBasisTotalAmount, '0,00')"/> €</fo:block>
-                  </fo:table-cell>
-                </fo:table-row>
-                <fo:table-row>
-                  <fo:table-cell padding="5pt">
-                    <fo:block>MwSt. 19%:</fo:block>
-                  </fo:table-cell>
-                  <fo:table-cell padding="5pt" text-align="right">
-                    <fo:block><xsl:value-of select="format-number(rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeSettlement/ram:ApplicableTradeTax/ram:CalculatedAmount, '0,00')"/> €</fo:block>
-                  </fo:table-cell>
-                </fo:table-row>
-                <fo:table-row background-color="#2c3e50" color="white">
-                  <fo:table-cell padding="8pt">
-                    <fo:block font-weight="bold" font-size="12pt">GESAMTBETRAG:</fo:block>
-                  </fo:table-cell>
-                  <fo:table-cell padding="8pt" text-align="right">
-                    <fo:block font-weight="bold" font-size="12pt"><xsl:value-of select="format-number(rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeSettlement/ram:SpecifiedTradeSettlementHeaderMonetarySummation/ram:GrandTotalAmount, '0,00')"/> €</fo:block>
-                  </fo:table-cell>
-                </fo:table-row>
-              </fo:table-body>
-            </fo:table>
-          </fo:block-container>
+
+          <!-- Simple Total Section -->
+          <fo:table width="100%" margin-top="15mm">
+            <fo:table-column column-width="70%"/>
+            <fo:table-column column-width="30%"/>
+            <fo:table-body>
+              <fo:table-row>
+                <fo:table-cell padding="8pt">
+                  <fo:block font-weight="bold" font-size="14pt">GESAMTSUMME:</fo:block>
+                </fo:table-cell>
+                <fo:table-cell padding="8pt" text-align="right">
+                  <fo:block font-weight="bold" font-size="14pt"><xsl:value-of select="format-number(rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeSettlement/ram:SpecifiedTradeSettlementHeaderMonetarySummation/ram:GrandTotalAmount, '0,00')"/> €</fo:block>
+                </fo:table-cell>
+              </fo:table-row>
+            </fo:table-body>
+          </fo:table>
           
         </fo:flow>
       </fo:page-sequence>
