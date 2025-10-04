@@ -55,6 +55,30 @@
               <fo:block font-weight="bold" color="#2c3e50" margin-bottom="5pt">RECHNUNGSSTELLER</fo:block>
               <fo:block><xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:Name"/></fo:block>
               <fo:block><xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:PostalTradeAddress/ram:LineOne"/></fo:block>
+
+              <!-- Website from URIUniversalCommunication -->
+              <xsl:if test="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:URIUniversalCommunication/ram:URIID">
+                <fo:block margin-top="3pt">
+                  <xsl:text>Website: </xsl:text>
+                  <xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:URIUniversalCommunication/ram:URIID"/>
+                </fo:block>
+              </xsl:if>
+
+              <!-- Email from DefinedTradeContact -->
+              <xsl:if test="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:DefinedTradeContact/ram:EmailURIUniversalCommunication/ram:URIID">
+                <fo:block margin-top="2pt">
+                  <xsl:text>E-Mail: </xsl:text>
+                  <xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:DefinedTradeContact/ram:EmailURIUniversalCommunication/ram:URIID"/>
+                </fo:block>
+              </xsl:if>
+
+              <!-- VAT ID from SpecifiedTaxRegistration -->
+              <xsl:if test="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:SpecifiedTaxRegistration/ram:ID">
+                <fo:block margin-top="2pt">
+                  <xsl:text>USt-Id: </xsl:text>
+                  <xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:SpecifiedTaxRegistration/ram:ID"/>
+                </fo:block>
+              </xsl:if>
             </fo:block>
 
             <!-- Recipient Card -->

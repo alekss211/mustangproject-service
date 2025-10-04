@@ -69,6 +69,47 @@ public class TestController {
             logger.info("=== LOCAL TEST: ZUGFeRD Generation Completed ===");
         }
     }
+
+    @PostMapping(value = "/generate-xml-debug", produces = MediaType.APPLICATION_XML_VALUE)
+    public ResponseEntity<?> testXMLDebug() {
+        logger.info("=== LOCAL TEST: XML Debug Started ===");
+        
+        try {
+            // Create test data based on your actual backend data
+            InvoiceDTO testInvoice = createTestInvoiceData();
+            
+            logger.info("Test invoice created: {}", testInvoice.getInvoiceNumber());
+            
+            // Generate XML for debugging
+            String xmlContent = zugferdGenerationService.generateXMLDebug(testInvoice);
+            
+            logger.info("XML generated successfully: {} characters", xmlContent.length());
+            
+            // Return XML
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_XML);
+            headers.setContentDispositionFormData("attachment", "debug_invoice_" + testInvoice.getInvoiceNumber() + ".xml");
+            
+            return new ResponseEntity<>(xmlContent, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            logger.error("LOCAL TEST: XML debug generation failed", e);
+            
+            // Return detailed error response
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "Failed to generate XML debug: " + e.getMessage());
+            errorResponse.put("service", "mustangproject-service-local-test");
+            errorResponse.put("error_type", e.getClass().getSimpleName());
+            errorResponse.put("stack_trace", e.getStackTrace()[0].toString());
+            
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errorResponse);
+        } finally {
+            logger.info("=== LOCAL TEST: XML Debug Completed ===");
+        }
+    }
     
     private InvoiceDTO createTestInvoiceData() {
         InvoiceDTO invoice = new InvoiceDTO();
@@ -80,7 +121,7 @@ public class TestController {
         invoice.setCompanyInfo3("kontakt@musterfirma.de");
         invoice.setCompanyInfo4("Ust.-ID: DE1234567890");
         
-        // Bill to information
+        // Bill to information (recipient)
         invoice.setBillToInfo1("Max Mustermann");
         invoice.setBillToInfo2("Musterstraße 123");
         invoice.setBillToInfo3("12345 Musterstadt, Deutschland");

@@ -101,6 +101,9 @@ public class InvoiceDTO {
     @JsonProperty("bill_to_info5")
     private String billToInfo5;
     
+    @JsonProperty("bill_to_info6")
+    private String billToInfo6;
+    
     // Invoice details
     @JsonProperty("invoice_title")
     private String invoiceTitle;
@@ -307,6 +310,9 @@ public class InvoiceDTO {
     
     public String getBillToInfo5() { return billToInfo5; }
     public void setBillToInfo5(String billToInfo5) { this.billToInfo5 = billToInfo5; }
+    
+    public String getBillToInfo6() { return billToInfo6; }
+    public void setBillToInfo6(String billToInfo6) { this.billToInfo6 = billToInfo6; }
     
     public String getInvoiceTitle() { return invoiceTitle; }
     public void setInvoiceTitle(String invoiceTitle) { this.invoiceTitle = invoiceTitle; }

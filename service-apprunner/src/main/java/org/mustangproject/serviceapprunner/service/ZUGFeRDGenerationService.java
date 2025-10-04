@@ -6,7 +6,9 @@ import org.mustangproject.serviceapprunner.dto.TaxDTO;
 import org.mustangproject.Invoice;
 import org.mustangproject.Item;
 import org.mustangproject.Product;
+import org.mustangproject.SchemedID;
 import org.mustangproject.TradeParty;
+import org.mustangproject.Contact;
 import org.mustangproject.ZUGFeRD.ZUGFeRD2PullProvider;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -92,20 +94,39 @@ public class ZUGFeRDGenerationService {
         invoice.setDueDate(localDateToDate(dueDate));
         
         // Set seller information (company)
-        logger.info("Setting seller information: name={}, street={}", 
+        logger.info("Setting seller information: name={}, street={}",
             dto.getCompanyName(), dto.getCompanyInfo1());
         TradeParty sender = new TradeParty();
         sender.setName(dto.getCompanyName());
         sender.setStreet(dto.getCompanyInfo1());
-        sender.setZIP(dto.getCompanyInfo3());
-        sender.setLocation(dto.getCompanyInfo3());
-        sender.setCountry(dto.getCompanyInfo3());
-        sender.setVATID(dto.getCompanyInfo4());
-        // Note: Tax number is typically part of VAT ID in ZUGFeRD
+        // Note: We don't have separate address fields in the DTO, so we'll leave ZIP/Location/Country empty for now
+        // to avoid conflicts with email and website fields
+        
+        // Set seller URI communication (website) if available
+        if (dto.getCompanyInfo2() != null && !dto.getCompanyInfo2().isEmpty()) {
+            logger.info("Setting seller website: {}", dto.getCompanyInfo2());
+            SchemedID websiteId = new SchemedID("URI", dto.getCompanyInfo2());
+            sender.addUriUniversalCommunicationID(websiteId);
+        }
+
+        // Set seller contact information if available (email)
+        if (dto.getCompanyInfo3() != null && !dto.getCompanyInfo3().isEmpty()) {
+            logger.info("Setting seller email: {}", dto.getCompanyInfo3());
+            Contact sellerContact = new Contact();
+            sellerContact.setEMail(dto.getCompanyInfo3());
+            sender.setContact(sellerContact);
+        }
+
+        // Set seller VAT ID if available (this represents the Ust-Id)
+        if (dto.getCompanyInfo4() != null && !dto.getCompanyInfo4().isEmpty()) {
+            logger.info("Setting seller VAT ID: {}", dto.getCompanyInfo4());
+            sender.setVATID(dto.getCompanyInfo4());
+        }
+
         invoice.setSender(sender);
         
         // Set buyer information
-        logger.info("Setting buyer information: name={}, street={}", 
+        logger.info("Setting buyer information: name={}, street={}",
             dto.getBillToInfo1(), dto.getBillToInfo2());
         TradeParty recipient = new TradeParty();
         recipient.setName(dto.getBillToInfo1());
@@ -113,6 +134,7 @@ public class ZUGFeRDGenerationService {
         recipient.setZIP(dto.getBillToInfo3());
         recipient.setLocation(dto.getBillToInfo3());
         recipient.setCountry(dto.getBillToInfo3());
+
         invoice.setRecipient(recipient);
         
         // Set currency
@@ -303,5 +325,31 @@ public class ZUGFeRDGenerationService {
         }
         
         return xmlContent;
+    }
+
+    /**
+     * Generate XML debug output for testing
+     */
+    public String generateXMLDebug(InvoiceDTO dto) {
+        logger.info("=== XML DEBUG: Starting XML generation ===");
+        
+        try {
+            // Create invoice object
+            Invoice invoice = createInvoice(dto);
+            logger.info("XML DEBUG: Invoice object created successfully");
+            
+            // Generate XML using Mustang library
+            ZUGFeRD2PullProvider provider = new ZUGFeRD2PullProvider();
+            provider.generateXML(invoice);
+            byte[] xmlBytes = provider.getXML();
+            String xmlContent = new String(xmlBytes, "UTF-8");
+            logger.info("XML DEBUG: XML export completed, length: {} characters", xmlContent.length());
+            
+            return xmlContent;
+            
+        } catch (Exception e) {
+            logger.error("XML DEBUG: Failed to generate XML", e);
+            throw new RuntimeException("Failed to generate XML debug: " + e.getMessage(), e);
+        }
     }
 }
