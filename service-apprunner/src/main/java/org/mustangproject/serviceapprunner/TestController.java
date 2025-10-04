@@ -137,8 +137,12 @@ public class TestController {
         invoice.setAmountTotal(119.0);
         invoice.setAmountDue(119.0);
         
-        // Terms
-        invoice.setTerms("Vielen Dank für Ihren Auftrag. Bitte senden Sie Zahlungen vor dem Fälligkeitsdatum.");
+        // Bank details
+        invoice.setIban("DE89370400440532013000");
+        invoice.setBic("COBADEFFXXX");
+        
+        // Terms (bank details will be automatically appended by the service)
+        invoice.setTerms("Bitte begleichen Sie den oben genannten Gesamtbetrag bis zum 08.10.2025.");
         
         // Items
         List<InvoiceItemDTO> items = new ArrayList<>();

@@ -9,6 +9,7 @@ import org.mustangproject.Product;
 import org.mustangproject.SchemedID;
 import org.mustangproject.TradeParty;
 import org.mustangproject.Contact;
+import org.mustangproject.BankDetails;
 import org.mustangproject.ZUGFeRD.ZUGFeRD2PullProvider;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -123,6 +124,14 @@ public class ZUGFeRDGenerationService {
             sender.setVATID(dto.getCompanyInfo4());
         }
 
+        // Set seller bank details if available
+        if (dto.getIban() != null && !dto.getIban().isEmpty()) {
+            logger.info("Setting seller bank details: IBAN={}, BIC={}", dto.getIban(), dto.getBic());
+            BankDetails bankDetails = new BankDetails(dto.getIban(), dto.getBic());
+            bankDetails.setAccountName(dto.getCompanyName());
+            sender.addBankDetails(bankDetails);
+        }
+
         invoice.setSender(sender);
         
         // Set buyer information
@@ -166,10 +175,29 @@ public class ZUGFeRDGenerationService {
             }
         }
         
-        // Set payment terms
+        // Set payment terms with bank details appended
+        String paymentTerms = "";
         if (dto.getTerms() != null && !dto.getTerms().isEmpty()) {
-            logger.info("Setting payment terms: {}", dto.getTerms());
-            invoice.setPaymentTermDescription(dto.getTerms());
+            paymentTerms = dto.getTerms();
+        }
+        
+        // Append bank details if available
+        if (dto.getIban() != null && !dto.getIban().isEmpty()) {
+            if (!paymentTerms.isEmpty()) {
+                paymentTerms += "\n\n";
+            }
+            paymentTerms += "Zahlungsinformationen:\n";
+            paymentTerms += "Empfänger: " + (dto.getCompanyName() != null ? dto.getCompanyName() : "N/A") + "\n";
+            paymentTerms += "IBAN: " + dto.getIban() + "\n";
+            if (dto.getBic() != null && !dto.getBic().isEmpty()) {
+                paymentTerms += "BIC: " + dto.getBic();
+            }
+            logger.info("Appended bank details to payment terms");
+        }
+        
+        if (!paymentTerms.isEmpty()) {
+            logger.info("Setting payment terms with bank details");
+            invoice.setPaymentTermDescription(paymentTerms);
         }
         
         logger.info("Invoice object creation completed successfully");

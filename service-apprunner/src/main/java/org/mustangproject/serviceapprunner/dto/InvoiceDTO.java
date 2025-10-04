@@ -168,6 +168,13 @@ public class InvoiceDTO {
     @JsonProperty("terms")
     private String terms;
     
+    // Bank details
+    @JsonProperty("iban")
+    private String iban;
+    
+    @JsonProperty("bic")
+    private String bic;
+    
     // Currency and formatting
     @JsonProperty("date_format")
     private String dateFormat;
@@ -373,6 +380,12 @@ public class InvoiceDTO {
     
     public String getTerms() { return terms; }
     public void setTerms(String terms) { this.terms = terms; }
+    
+    public String getIban() { return iban; }
+    public void setIban(String iban) { this.iban = iban; }
+    
+    public String getBic() { return bic; }
+    public void setBic(String bic) { this.bic = bic; }
     
     public String getDateFormat() { return dateFormat; }
     public void setDateFormat(String dateFormat) { this.dateFormat = dateFormat; }
