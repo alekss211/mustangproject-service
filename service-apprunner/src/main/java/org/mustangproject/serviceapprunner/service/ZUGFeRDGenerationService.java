@@ -74,6 +74,18 @@ public class ZUGFeRDGenerationService {
         logger.info("Creating Invoice object with data: number={}, company={}", 
             dto.getInvoiceNumber(), dto.getCompanyName());
         
+        // Debug DTO fields for payment information
+        logger.info("=== DTO PAYMENT FIELDS DEBUG ===");
+        logger.info("iban field: '{}'", dto.getIban());
+        logger.info("bic field: '{}'", dto.getBic());
+        logger.info("company_info5: '{}'", dto.getCompanyInfo5());
+        logger.info("company_info6: '{}'", dto.getCompanyInfo6());
+        logger.info("company_info7: '{}'", dto.getCompanyInfo7());
+        logger.info("company_info8: '{}'", dto.getCompanyInfo8());
+        logger.info("company_info9: '{}'", dto.getCompanyInfo9());
+        logger.info("terms: '{}'", dto.getTerms());
+        logger.info("=== END DTO PAYMENT FIELDS DEBUG ===");
+        
         Invoice invoice = new Invoice();
         
         // Set basic invoice information
@@ -182,23 +194,65 @@ public class ZUGFeRDGenerationService {
             paymentTerms = dto.getTerms();
         }
         
+        // Extract IBAN and BIC from either dedicated fields or company_info fields
+        String iban = dto.getIban();
+        String bic = dto.getBic();
+        
+        logger.info("Initial IBAN from dedicated field: {}", iban);
+        logger.info("Initial BIC from dedicated field: {}", bic);
+        logger.info("company_info7 value: {}", dto.getCompanyInfo7());
+        logger.info("company_info8 value: {}", dto.getCompanyInfo8());
+        
+        // If IBAN/BIC are not in dedicated fields, try to extract from company_info7/8
+        if ((iban == null || iban.isEmpty()) && dto.getCompanyInfo7() != null) {
+            // company_info7 might contain "IBAN: DE12345..."
+            String info7 = dto.getCompanyInfo7();
+            logger.info("Attempting to extract IBAN from company_info7: '{}'", info7);
+            if (info7.toLowerCase().contains("iban")) {
+                iban = info7.replaceAll("(?i)iban\\s*:?\\s*", "").trim();
+                logger.info("Successfully extracted IBAN from company_info7: '{}'", iban);
+            } else {
+                logger.warn("company_info7 does not contain 'iban': '{}'", info7);
+            }
+        } else {
+            logger.info("Skipping IBAN extraction - iban field: '{}', company_info7: '{}'", iban, dto.getCompanyInfo7());
+        }
+        
+        if ((bic == null || bic.isEmpty()) && dto.getCompanyInfo8() != null) {
+            // company_info8 might contain "BIC: ABCDEFGH"
+            String info8 = dto.getCompanyInfo8();
+            logger.info("Attempting to extract BIC from company_info8: '{}'", info8);
+            if (info8.toLowerCase().contains("bic")) {
+                bic = info8.replaceAll("(?i)bic\\s*:?\\s*", "").trim();
+                logger.info("Successfully extracted BIC from company_info8: '{}'", bic);
+            } else {
+                logger.warn("company_info8 does not contain 'bic': '{}'", info8);
+            }
+        } else {
+            logger.info("Skipping BIC extraction - bic field: '{}', company_info8: '{}'", bic, dto.getCompanyInfo8());
+        }
+        
         // Append bank details if available
-        if (dto.getIban() != null && !dto.getIban().isEmpty()) {
+        if (iban != null && !iban.isEmpty()) {
             if (!paymentTerms.isEmpty()) {
                 paymentTerms += "\n\n";
             }
             paymentTerms += "Zahlungsinformationen:\n";
             paymentTerms += "Empfänger: " + (dto.getCompanyName() != null ? dto.getCompanyName() : "N/A") + "\n";
-            paymentTerms += "IBAN: " + dto.getIban() + "\n";
-            if (dto.getBic() != null && !dto.getBic().isEmpty()) {
-                paymentTerms += "BIC: " + dto.getBic();
+            paymentTerms += "IBAN: " + iban + "\n";
+            if (bic != null && !bic.isEmpty()) {
+                paymentTerms += "BIC: " + bic;
             }
-            logger.info("Appended bank details to payment terms");
+            logger.info("Appended bank details to payment terms. Final IBAN: '{}', BIC: '{}'", iban, bic);
+        } else {
+            logger.warn("NOT appending bank details - IBAN is null or empty: '{}'", iban);
         }
         
         if (!paymentTerms.isEmpty()) {
-            logger.info("Setting payment terms with bank details");
+            logger.info("Setting payment terms: '{}'", paymentTerms);
             invoice.setPaymentTermDescription(paymentTerms);
+        } else {
+            logger.warn("Payment terms are empty - not setting payment term description");
         }
         
         logger.info("Invoice object creation completed successfully");
