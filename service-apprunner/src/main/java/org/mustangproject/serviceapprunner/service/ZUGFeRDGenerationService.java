@@ -162,12 +162,13 @@ public class ZUGFeRDGenerationService {
                 Product product = new Product();
                 product.setName(itemDto.getItemDescription());
                 item.setProduct(product);
-                item.setQuantity(new BigDecimal(itemDto.getItemQuantity()));
-                item.setPrice(new BigDecimal(itemDto.getItemPrice()));
+                // Use BigDecimal.valueOf() to avoid precision issues with double conversion
+                item.setQuantity(BigDecimal.valueOf(itemDto.getItemQuantity()));
+                item.setPrice(BigDecimal.valueOf(itemDto.getItemPrice()));
                 // Note: Unit and VAT are typically set on the product level
                 if (dto.getTaxes() != null && !dto.getTaxes().isEmpty()) {
                     TaxDTO tax = dto.getTaxes().get(0); // Use first tax
-                    product.setVATPercent(new BigDecimal(tax.getTaxPercentage()));
+                    product.setVATPercent(BigDecimal.valueOf(tax.getTaxPercentage()));
                     logger.info("Set VAT percentage: {}%", tax.getTaxPercentage());
                 }
                 

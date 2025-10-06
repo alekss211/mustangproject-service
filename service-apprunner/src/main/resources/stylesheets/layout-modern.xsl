@@ -9,6 +9,9 @@
 
   <xsl:output method="xml" version="1.0" encoding="utf-8" /> 
   <xsl:param name="foengine"/>
+  
+  <!-- Define German decimal format: comma as decimal separator, dot as thousands separator -->
+  <xsl:decimal-format name="de" decimal-separator="," grouping-separator="." NaN="" />
 
   <xsl:template match="rsm:CrossIndustryInvoice">
     <fo:root font-family="SourceSansPro">
@@ -134,10 +137,10 @@
                     <fo:block text-align="center"><xsl:value-of select="ram:SpecifiedLineTradeDelivery/ram:BilledQuantity"/></fo:block>
                   </fo:table-cell>
                   <fo:table-cell padding="8pt" border="0.5pt solid #dee2e6">
-                    <fo:block text-align="right"><xsl:value-of select="format-number(ram:SpecifiedLineTradeAgreement/ram:NetPriceProductTradePrice/ram:ChargeAmount, '0,00')"/> €</fo:block>
+                    <fo:block text-align="right"><xsl:value-of select="format-number(ram:SpecifiedLineTradeAgreement/ram:NetPriceProductTradePrice/ram:ChargeAmount, '#.##0,00', 'de')"/> €</fo:block>
                   </fo:table-cell>
                   <fo:table-cell padding="8pt" border="0.5pt solid #dee2e6">
-                    <fo:block text-align="right" font-weight="bold"><xsl:value-of select="format-number(ram:SpecifiedLineTradeSettlement/ram:SpecifiedTradeSettlementLineMonetarySummation/ram:LineTotalAmount, '0,00')"/> €</fo:block>
+                    <fo:block text-align="right" font-weight="bold"><xsl:value-of select="format-number(ram:SpecifiedLineTradeSettlement/ram:SpecifiedTradeSettlementLineMonetarySummation/ram:LineTotalAmount, '#.##0,00', 'de')"/> €</fo:block>
                   </fo:table-cell>
                 </fo:table-row>
               </xsl:for-each>
@@ -154,7 +157,7 @@
                   <fo:block font-weight="bold" font-size="14pt">GESAMTSUMME:</fo:block>
                 </fo:table-cell>
                 <fo:table-cell padding="8pt" text-align="right">
-                  <fo:block font-weight="bold" font-size="14pt"><xsl:value-of select="format-number(rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeSettlement/ram:SpecifiedTradeSettlementHeaderMonetarySummation/ram:GrandTotalAmount, '0,00')"/> €</fo:block>
+                  <fo:block font-weight="bold" font-size="14pt"><xsl:value-of select="format-number(rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeSettlement/ram:SpecifiedTradeSettlementHeaderMonetarySummation/ram:GrandTotalAmount, '#.##0,00', 'de')"/> €</fo:block>
                 </fo:table-cell>
               </fo:table-row>
             </fo:table-body>
