@@ -2,7 +2,6 @@ package org.mustangproject.serviceapprunner.service;
 
 import org.mustangproject.serviceapprunner.dto.InvoiceDTO;
 import org.mustangproject.serviceapprunner.dto.InvoiceItemDTO;
-import org.mustangproject.serviceapprunner.dto.TaxDTO;
 import org.mustangproject.Invoice;
 import org.mustangproject.Item;
 import org.mustangproject.Product;
@@ -177,12 +176,10 @@ public class ZUGFeRDGenerationService {
                 // Use BigDecimal.valueOf() to avoid precision issues with double conversion
                 item.setQuantity(BigDecimal.valueOf(itemDto.getItemQuantity()));
                 item.setPrice(BigDecimal.valueOf(itemDto.getItemPrice()));
-                // Note: Unit and VAT are typically set on the product level
-                if (dto.getTaxes() != null && !dto.getTaxes().isEmpty()) {
-                    TaxDTO tax = dto.getTaxes().get(0); // Use first tax
-                    product.setVATPercent(BigDecimal.valueOf(tax.getTaxPercentage()));
-                    logger.info("Set VAT percentage: {}%", tax.getTaxPercentage());
-                }
+                
+                // NOTE: VAT calculation is handled by the backend, not by this service
+                // The prices provided already include VAT calculations
+                // DO NOT set VAT percentage here as it would cause double taxation
                 
                 invoice.addItem(item);
             }

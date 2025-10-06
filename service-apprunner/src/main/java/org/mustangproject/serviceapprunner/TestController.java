@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,6 +120,13 @@ public class TestController {
         invoice.setCompanyInfo3("kontakt@musterfirma.de");
         invoice.setCompanyInfo4("Ust.-ID: DE1234567890");
         
+        // Payment details in company_info fields (matching production format)
+        invoice.setCompanyInfo5("Zahlungsdetails:");
+        invoice.setCompanyInfo6("Kontoinhaber: Musterfirma");
+        invoice.setCompanyInfo7("IBAN: DE89370400440532013000");
+        invoice.setCompanyInfo8("BIC: COBADEFFXXX");
+        invoice.setCompanyInfo9("");
+        
         // Bill to information (recipient)
         invoice.setBillToInfo1("Max Mustermann");
         invoice.setBillToInfo2("Musterstraße 123");
@@ -137,9 +143,8 @@ public class TestController {
         invoice.setAmountTotal(119.0);
         invoice.setAmountDue(119.0);
         
-        // Bank details
-        invoice.setIban("DE89370400440532013000");
-        invoice.setBic("COBADEFFXXX");
+        // NOTE: IBAN and BIC are now in company_info7 and company_info8 (production format)
+        // The service will automatically extract and append them to payment terms
         
         // Terms (bank details will be automatically appended by the service)
         invoice.setTerms("Bitte begleichen Sie den oben genannten Gesamtbetrag bis zum 08.10.2025.");
