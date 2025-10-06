@@ -134,7 +134,16 @@
                     <fo:block><xsl:value-of select="ram:SpecifiedTradeProduct/ram:Name"/></fo:block>
                   </fo:table-cell>
                   <fo:table-cell padding="8pt" border="0.5pt solid #dee2e6">
-                    <fo:block text-align="center"><xsl:value-of select="ram:SpecifiedLineTradeDelivery/ram:BilledQuantity"/></fo:block>
+                    <fo:block text-align="center">
+                      <xsl:choose>
+                        <xsl:when test="ram:SpecifiedLineTradeDelivery/ram:BilledQuantity = floor(ram:SpecifiedLineTradeDelivery/ram:BilledQuantity)">
+                          <xsl:value-of select="format-number(ram:SpecifiedLineTradeDelivery/ram:BilledQuantity, '#')"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="format-number(ram:SpecifiedLineTradeDelivery/ram:BilledQuantity, '#,##0.##', 'de')"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </fo:block>
                   </fo:table-cell>
                   <fo:table-cell padding="8pt" border="0.5pt solid #dee2e6">
                     <fo:block text-align="right"><xsl:value-of select="format-number(ram:SpecifiedLineTradeAgreement/ram:NetPriceProductTradePrice/ram:ChargeAmount, '#.##0,00', 'de')"/> €</fo:block>
