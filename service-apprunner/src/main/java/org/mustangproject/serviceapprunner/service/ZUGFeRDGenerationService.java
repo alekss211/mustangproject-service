@@ -201,30 +201,32 @@ public class ZUGFeRDGenerationService {
         logger.info("company_info7 value: {}", dto.getCompanyInfo7());
         logger.info("company_info8 value: {}", dto.getCompanyInfo8());
         
-        // If IBAN/BIC are not in dedicated fields, try to extract from company_info7/8
-        if ((iban == null || iban.isEmpty()) && dto.getCompanyInfo7() != null) {
-            // company_info7 might contain "IBAN: DE12345..."
-            String info7 = dto.getCompanyInfo7();
-            logger.info("Attempting to extract IBAN from company_info7: '{}'", info7);
+        // If IBAN/BIC are not in dedicated fields, use company_info7/8 directly
+        if ((iban == null || iban.isEmpty()) && dto.getCompanyInfo7() != null && !dto.getCompanyInfo7().isEmpty()) {
+            String info7 = dto.getCompanyInfo7().trim();
+            logger.info("Using company_info7 as IBAN: '{}'", info7);
+            // Check if it contains the word "iban" (formatted case), otherwise use as-is
             if (info7.toLowerCase().contains("iban")) {
                 iban = info7.replaceAll("(?i)iban\\s*:?\\s*", "").trim();
-                logger.info("Successfully extracted IBAN from company_info7: '{}'", iban);
+                logger.info("Extracted IBAN from formatted company_info7: '{}'", iban);
             } else {
-                logger.warn("company_info7 does not contain 'iban': '{}'", info7);
+                iban = info7;
+                logger.info("Using company_info7 directly as IBAN: '{}'", iban);
             }
         } else {
             logger.info("Skipping IBAN extraction - iban field: '{}', company_info7: '{}'", iban, dto.getCompanyInfo7());
         }
         
-        if ((bic == null || bic.isEmpty()) && dto.getCompanyInfo8() != null) {
-            // company_info8 might contain "BIC: ABCDEFGH"
-            String info8 = dto.getCompanyInfo8();
-            logger.info("Attempting to extract BIC from company_info8: '{}'", info8);
+        if ((bic == null || bic.isEmpty()) && dto.getCompanyInfo8() != null && !dto.getCompanyInfo8().isEmpty()) {
+            String info8 = dto.getCompanyInfo8().trim();
+            logger.info("Using company_info8 as BIC: '{}'", info8);
+            // Check if it contains the word "bic" (formatted case), otherwise use as-is
             if (info8.toLowerCase().contains("bic")) {
                 bic = info8.replaceAll("(?i)bic\\s*:?\\s*", "").trim();
-                logger.info("Successfully extracted BIC from company_info8: '{}'", bic);
+                logger.info("Extracted BIC from formatted company_info8: '{}'", bic);
             } else {
-                logger.warn("company_info8 does not contain 'bic': '{}'", info8);
+                bic = info8;
+                logger.info("Using company_info8 directly as BIC: '{}'", bic);
             }
         } else {
             logger.info("Skipping BIC extraction - bic field: '{}', company_info8: '{}'", bic, dto.getCompanyInfo8());
