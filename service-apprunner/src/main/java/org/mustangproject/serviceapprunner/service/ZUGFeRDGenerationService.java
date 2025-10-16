@@ -146,14 +146,22 @@ public class ZUGFeRDGenerationService {
         invoice.setSender(sender);
         
         // Set buyer information
-        logger.info("Setting buyer information: name={}, street={}",
-            dto.getBillToInfo1(), dto.getBillToInfo2());
+        logger.info("Setting buyer information: name={}, street={}, email={}",
+            dto.getBillToInfo1(), dto.getBillToInfo2(), dto.getBillToInfo4());
         TradeParty recipient = new TradeParty();
         recipient.setName(dto.getBillToInfo1());
         recipient.setStreet(dto.getBillToInfo2());
         recipient.setZIP(dto.getBillToInfo3());
         recipient.setLocation(dto.getBillToInfo3());
         recipient.setCountry(dto.getBillToInfo3());
+
+        // Set recipient contact information if available (email)
+        if (dto.getBillToInfo4() != null && !dto.getBillToInfo4().isEmpty()) {
+            logger.info("Setting recipient email: {}", dto.getBillToInfo4());
+            Contact recipientContact = new Contact();
+            recipientContact.setEMail(dto.getBillToInfo4());
+            recipient.setContact(recipientContact);
+        }
 
         invoice.setRecipient(recipient);
         

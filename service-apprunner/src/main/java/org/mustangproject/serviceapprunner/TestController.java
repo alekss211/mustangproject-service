@@ -131,6 +131,7 @@ public class TestController {
         invoice.setBillToInfo1("Max Mustermann");
         invoice.setBillToInfo2("Musterstraße 123");
         invoice.setBillToInfo3("12345 Musterstadt, Deutschland");
+        invoice.setBillToInfo4("max.mustermann@example.com");  // Customer email
         
         // Invoice details
         invoice.setInvoiceNumber("113123123");

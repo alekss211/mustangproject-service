@@ -90,6 +90,14 @@
               <fo:block font-weight="bold" color="#2c3e50" margin-bottom="5pt">RECHNUNGSEMPFÄNGER</fo:block>
               <fo:block><xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:BuyerTradeParty/ram:Name"/></fo:block>
               <fo:block><xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:BuyerTradeParty/ram:PostalTradeAddress/ram:LineOne"/></fo:block>
+              
+              <!-- Email from DefinedTradeContact -->
+              <xsl:if test="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:BuyerTradeParty/ram:DefinedTradeContact/ram:EmailURIUniversalCommunication/ram:URIID">
+                <fo:block margin-top="2pt">
+                  <xsl:text>E-Mail: </xsl:text>
+                  <xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:BuyerTradeParty/ram:DefinedTradeContact/ram:EmailURIUniversalCommunication/ram:URIID"/>
+                </fo:block>
+              </xsl:if>
             </fo:block>
           </fo:block-container>
           
