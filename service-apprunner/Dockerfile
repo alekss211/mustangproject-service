@@ -26,7 +26,7 @@ RUN mvn clean package -DskipTests -pl service-apprunner -am
 RUN ls -la /app/service-apprunner/target/
 
 # Runtime Stage
-FROM openjdk:11-jre-slim
+FROM eclipse-temurin:11-jre-jammy
 
 WORKDIR /app
 
