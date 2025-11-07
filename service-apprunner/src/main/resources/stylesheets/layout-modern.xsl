@@ -53,9 +53,9 @@
           </fo:block>
           
           <!-- Business Info Cards -->
-          <fo:block-container margin-bottom="20mm">
+          <fo:block-container margin-bottom="12mm">
             <!-- Sender Card -->
-            <fo:block border="1pt solid #ecf0f1" background-color="#f8f9fa" padding="10pt" margin-bottom="15mm">
+            <fo:block border="1pt solid #ecf0f1" background-color="#f8f9fa" padding="10pt" margin-bottom="8mm">
               <fo:block font-weight="bold" color="#2c3e50" margin-bottom="5pt">RECHNUNGSSTELLER</fo:block>
               <fo:block><xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:Name"/></fo:block>
               <fo:block><xsl:value-of select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty/ram:PostalTradeAddress/ram:LineOne"/></fo:block>
@@ -163,7 +163,6 @@
               </xsl:for-each>
             </fo:table-body>
           </fo:table>
-
           <!-- VAT and Total Section -->
           <fo:table width="100%" margin-top="8mm">
             <fo:table-column column-width="70%"/>
