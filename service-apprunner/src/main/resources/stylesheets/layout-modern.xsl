@@ -33,7 +33,7 @@
         <fo:flow flow-name="xsl-region-body">
           
           <!-- Simple Header -->
-          <fo:block font-size="24pt" font-weight="bold" margin-bottom="10mm" text-align="left">
+          <fo:block font-size="24pt" font-weight="bold" margin-bottom="6mm" text-align="left">
             <xsl:choose>
               <xsl:when test="rsm:ExchangedDocument/ram:IssueDateTime/udt:DateTimeString">
                 <xsl:variable name="dateValue" select="rsm:ExchangedDocument/ram:IssueDateTime/udt:DateTimeString"/>
@@ -48,7 +48,7 @@
               </xsl:otherwise>
             </xsl:choose>
           </fo:block>
-          <fo:block font-size="12pt" margin-bottom="20mm">
+          <fo:block font-size="12pt" margin-bottom="12mm">
             Nr. <xsl:value-of select="rsm:ExchangedDocument/ram:ID"/>
           </fo:block>
           
@@ -164,11 +164,35 @@
             </fo:table-body>
           </fo:table>
 
-          <!-- Simple Total Section -->
-          <fo:table width="100%" margin-top="15mm">
+          <!-- VAT and Total Section -->
+          <fo:table width="100%" margin-top="8mm">
             <fo:table-column column-width="70%"/>
             <fo:table-column column-width="30%"/>
             <fo:table-body>
+              <!-- VAT Section -->
+              <xsl:for-each select="rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeSettlement/ram:ApplicableTradeTax[ram:CalculatedAmount > 0]">
+                <fo:table-row>
+                  <fo:table-cell padding="2pt">
+                    <fo:block font-size="12pt">
+                      <xsl:text>zzgl. </xsl:text>
+                      <xsl:value-of select="format-number(ram:RateApplicablePercent, '#.##0', 'de')"/>
+                      <xsl:text>% MwSt.:</xsl:text>
+                    </fo:block>
+                  </fo:table-cell>
+                  <fo:table-cell padding="2pt" text-align="right">
+                    <fo:block font-size="12pt"><xsl:value-of select="format-number(ram:CalculatedAmount, '#.##0,00', 'de')"/> €</fo:block>
+                  </fo:table-cell>
+                </fo:table-row>
+              </xsl:for-each>
+              
+              <!-- Separator line -->
+              <fo:table-row>
+                <fo:table-cell padding="4pt" number-columns-spanned="2">
+                  <fo:block border-top="1pt solid #dee2e6" margin-top="4pt" margin-bottom="4pt">&#160;</fo:block>
+                </fo:table-cell>
+              </fo:table-row>
+              
+              <!-- Final Total -->
               <fo:table-row>
                 <fo:table-cell padding="8pt">
                   <fo:block font-weight="bold" font-size="14pt">GESAMTSUMME:</fo:block>

@@ -185,10 +185,11 @@ public class ZUGFeRDGenerationService {
                 item.setQuantity(BigDecimal.valueOf(itemDto.getItemQuantity()));
                 item.setPrice(BigDecimal.valueOf(itemDto.getItemPrice()));
                 
-                // NOTE: VAT calculation is handled by the backend, not by this service
-                // Set VAT to 0% to indicate no additional VAT calculation
-                // The prices provided already include any VAT amounts calculated by the backend
-                product.setVATPercent(BigDecimal.ZERO);
+                // Set VAT percentage from item data
+                // The VAT percentage is provided by the frontend/backend
+                BigDecimal vatPercent = BigDecimal.valueOf(itemDto.getItemTax());
+                product.setVATPercent(vatPercent);
+                logger.info("Setting VAT percentage for item '{}': {}%", itemDto.getItemDescription(), vatPercent);
                 
                 invoice.addItem(item);
             }
